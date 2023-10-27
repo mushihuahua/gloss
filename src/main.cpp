@@ -9,7 +9,7 @@ void alert(std::string file, std::string message, int line){
 }
 
 void alert(std::string file, std::string message){
-    std::cerr << file << " | " << "[error]: " << message << std::endl;
+    alert(file, message, 0);
 };
 
 int main(int argc, char *argv[]){
