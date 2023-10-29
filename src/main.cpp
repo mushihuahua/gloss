@@ -1,16 +1,13 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
+#include "lexer/lexer.hpp"
+#include "alerts.hpp"
+
+void run(const std::string& line);
 void runPrompt();
 void runFile(const char* path);
-
-void alert(std::string file, std::string message, int line){
-    std::cerr << file << ":" << line << " | " << "[error]: " << message << std::endl;
-}
-
-void alert(std::string file, std::string message){
-    alert(file, message, 0);
-};
 
 int main(int argc, char *argv[]){
 
@@ -21,7 +18,7 @@ int main(int argc, char *argv[]){
         try{
             runFile(argv[1]);
         } catch (const char* err){
-            alert(argv[1], err);
+            alert(err, argv[1]);
         }
     } else {
         runPrompt();
@@ -41,7 +38,7 @@ void runPrompt(){
 
         if(input.empty() || input == "exit") break;
 
-        std::cout << input << std::endl;
+        run(input);
     }
 
 }
@@ -58,6 +55,16 @@ void runFile(const char * path){
 
     while (std::getline(sourceCode, line))
     {
-        std::cout << line << std::endl;
+        run(line);
     }   
+}
+
+void run(const std::string& line){
+
+    Lexer lx = Lexer(line);
+    std::vector tokens = lx.scanTokens();
+ 
+    for(auto & token : tokens){
+        token.display();
+    }
 }
