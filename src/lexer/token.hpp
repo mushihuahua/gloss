@@ -10,7 +10,9 @@ enum TokenType {
     PlusToken, MinusToken,
     MultiplyToken, DivideToken,
 
-    LPARENToken, RPARENToken,
+    LParenToken, RParenToken,
+    LBraceToken, RBraceToken,
+    CommaToken, DotToken, SemicolonToken,
 
     UnknownToken,
     WhitespaceToken,
@@ -23,8 +25,8 @@ class SyntaxToken{
         const std::string mLexeme;
         const int mPosition;
     public:
-        SyntaxToken(TokenType type, std::string lexeme, int position);
+        SyntaxToken(TokenType type, const std::string& lexeme, int position);
         void display();
-        TokenType SyntaxToken::getType();
-        std::string SyntaxToken::getLexeme();
+        TokenType getType() const;
+        std::string getLexeme() const;
 };
