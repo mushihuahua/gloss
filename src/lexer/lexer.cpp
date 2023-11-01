@@ -15,25 +15,36 @@ char Lexer::current(){
         return '\0';
     }
 
-    return mSource[mPosition];
+    return mSource[mPosition++];
 }
 
 std::vector<SyntaxToken> Lexer::scanTokens(){
     while(!isEOF()){
-
         scanToken();
-        mPosition++;
     }
 
     addToken(EOFToken, "EOF");
     return mTokens;
 }
 
+bool Lexer::match(char expected) {
+    if (isEOF()) return false;
+
+    if(mSource[mPosition] == expected){
+        mPosition++;
+        return true;
+    }
+
+    return false;
+}
+
+
 void Lexer::scanToken(){
 
     mStart = mPosition;
+    char curr = current();
 
-    switch (current())
+    switch (curr)
     {
 
         case '(': addToken(LParenToken); break;
@@ -46,6 +57,19 @@ void Lexer::scanToken(){
         case '+': addToken(PlusToken); break;
         case ';': addToken(SemicolonToken); break;
         case '*': addToken(MultiplyToken); break; 
+
+        case '!':
+            addToken(match('=') ? ExclamationEqualToken : ExclamationToken);
+            break;
+        case '=':
+            addToken(match('=') ? EqualToken : EqualToken);
+            break;
+        case '<':
+            addToken(match('=') ? LessThanEqualToken : LessThanToken);
+            break;
+        case '>':
+            addToken(match('=') ? GreaterThanEqualToken : GreaterThanToken);
+            break;
 
 
         case ' ':
@@ -60,14 +84,14 @@ void Lexer::scanToken(){
 
         default:
             std::ostringstream err;
-            err << "Unexpected character '" << current() << "'";
+            err << "Unexpected character '" << curr << "'";
             alert(err.str(), mLine);
             break;
     }
 }
 
 void Lexer::addToken(TokenType type){
-    addToken(type, mSource.substr(mStart, (mPosition-mStart)+1));
+    addToken(type, mSource.substr(mStart, (mPosition-mStart)));
 }
 
 void Lexer::addToken(TokenType type, const std::string& lexeme){

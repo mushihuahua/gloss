@@ -12,7 +12,13 @@ enum TokenType {
 
     LParenToken, RParenToken,
     LBraceToken, RBraceToken,
-    CommaToken, DotToken, SemicolonToken,
+    CommaToken, DotToken, SemicolonToken, 
+
+    ExclamationToken, ExclamationEqualToken,
+    EqualToken, EqualEqualToken,
+
+    LessThanToken, LessThanEqualToken,
+    GreaterThanToken, GreaterThanEqualToken,
 
     UnknownToken,
     WhitespaceToken,
