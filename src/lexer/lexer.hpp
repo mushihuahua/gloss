@@ -19,6 +19,8 @@ class Lexer{
 
         void addToken(TokenType type);
         void addToken(TokenType type, const std::string& lexeme);
+
+        bool match(char expected);
     
     public:
         Lexer(const std::string&);
