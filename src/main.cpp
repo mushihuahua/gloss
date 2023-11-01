@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sstream>
 
 #include "lexer/lexer.hpp"
 #include "alerts.hpp"
@@ -8,6 +9,11 @@
 void run(const std::string& line);
 void runPrompt();
 void runFile(const char* path);
+
+bool endsWith(const std::string& str, const std::string& suffix){
+    return suffix.size() < str.size() &&
+           str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
 
 int main(int argc, char *argv[]){
 
@@ -45,18 +51,20 @@ void runPrompt(){
 
 void runFile(const char * path){
 
+    if(!endsWith(path, ".gls")){
+        throw "File is not a .gls file";
+    }
+
     std::ifstream sourceCode(path);
 
     if(!sourceCode.good()){
         throw "File does not exist";
     }  
 
-    std::string line; 
+    std::stringstream buffer;
+    buffer << sourceCode.rdbuf();
 
-    while (std::getline(sourceCode, line))
-    {
-        run(line);
-    }   
+    run(buffer.str()); 
 }
 
 void run(const std::string& line){
