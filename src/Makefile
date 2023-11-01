@@ -1,13 +1,19 @@
 CC:=clang++
 CFLAGS:=-Wall -c
 
+DEBUGFLAGS:= 
+
 RM:= rm -f
 OBJS:= main.o lexer.o token.o alerts.o
 
 all: main
 
+debug: DEBUGFLAGS += -g
+debug: CFLAGS += $(DEBUGFLAGS)
+debug: main
+
 main: main.o ./lexer/lexer.o ./lexer/token.o alerts.o
-	$(CC) $(OBJS) -o main
+	$(CC) $(DEBUGFLAGS) $(OBJS) -o main
 	$(info CREATED main)
 
 main.o:	main.cpp
