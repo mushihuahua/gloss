@@ -71,6 +71,13 @@ void Lexer::scanToken(){
             addToken(match('=') ? GreaterThanEqualToken : GreaterThanToken);
             break;
 
+        case '/':
+            if(match('/')){
+                while(current() != '\n' && !isEOF()){}
+            } else {
+                addToken(DivideToken);
+            }
+
 
         case ' ':
         case '\r':
