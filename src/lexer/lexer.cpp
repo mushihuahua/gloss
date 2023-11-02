@@ -10,12 +10,20 @@ bool Lexer::isEOF() const {
     return (mPosition >= mSource.length());
 }
 
-char Lexer::current(){
+char Lexer::nextChar(){
     if(isEOF()){
         return '\0';
     }
 
     return mSource[mPosition++];
+}
+
+char Lexer::current(){
+    if(isEOF()){
+        return '\0';
+    }
+
+    return mSource[mPosition];
 }
 
 std::vector<SyntaxToken> Lexer::scanTokens(){
@@ -42,7 +50,7 @@ bool Lexer::match(char expected) {
 void Lexer::scanToken(){
 
     mStart = mPosition;
-    char curr = current();
+    char curr = nextChar();
 
     switch (curr)
     {
@@ -73,10 +81,28 @@ void Lexer::scanToken(){
 
         case '/':
             if(match('/')){
-                while(current() != '\n' && !isEOF()){}
+                while(current() != '\n' && !isEOF()){ mPosition++; }
             } else {
                 addToken(DivideToken);
             }
+            break;
+
+        case '"':
+            while(current() != '"' && !isEOF()){
+                if(current() == '\n'){ mLine++; }
+                mPosition++;
+            }
+
+            if(isEOF()){
+                alert("Unterminated string literal", mLine);
+                break;
+            }
+            
+            mPosition++;
+
+            addToken(StringToken, mSource.substr(mStart+1, (mPosition-mStart)-2));
+
+            break;
 
 
         case ' ':
