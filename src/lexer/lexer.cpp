@@ -11,11 +11,12 @@ bool Lexer::isEOF() const {
 }
 
 char Lexer::nextChar(){
-    if(isEOF()){
+
+    if((mPosition+1 >= mSource.length())){
         return '\0';
     }
 
-    return mSource[mPosition++];
+    return mSource[(mPosition++)+1];
 }
 
 char Lexer::current(){
@@ -50,7 +51,19 @@ bool Lexer::match(char expected) {
 void Lexer::scanToken(){
 
     mStart = mPosition;
-    char curr = nextChar();
+    char curr = current();
+     mPosition++;
+
+    if(isdigit(curr)){
+        while(isdigit(current())){mPosition++;}
+
+        if(current() == '.' && isdigit(nextChar())){
+            while(isdigit(current())){mPosition++;}
+        }
+
+        addToken(NumberToken);
+        return;
+    }
 
     switch (curr)
     {
