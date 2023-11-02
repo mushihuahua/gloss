@@ -12,6 +12,7 @@ class Lexer{
         int mPosition = 0;
         int mLine = 1;
 
+        char nextChar();
         char current();
         bool isEOF() const;
 
