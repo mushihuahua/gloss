@@ -83,7 +83,7 @@ void Lexer::scanToken(){
             addToken(match('=') ? ExclamationEqualToken : ExclamationToken);
             break;
         case '=':
-            addToken(match('=') ? EqualToken : EqualToken);
+            addToken(match('=') ? EqualEqualToken : EqualToken);
             break;
         case '<':
             addToken(match('=') ? LessThanEqualToken : LessThanToken);
