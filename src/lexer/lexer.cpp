@@ -3,6 +3,12 @@
 #include "lexer.hpp"
 #include "../alerts.hpp"
 
+std::map<std::string, TokenType> keywords
+{
+    {"if", IfToken},
+    {"else", ElseToken}
+};
+
 Lexer::Lexer(const std::string& source)
     : mSource(source) {}
     
@@ -32,7 +38,7 @@ std::vector<SyntaxToken> Lexer::scanTokens(){
         scanToken();
     }
 
-    addToken(EOFToken, "EOF");
+    addToken(EOFToken, "EOF", mSource.length());
     return mTokens;
 }
 
@@ -63,6 +69,24 @@ void Lexer::scanToken(){
 
         addToken(NumberToken);
         return;
+    }
+
+    if(isalpha(curr)){
+        while(isalpha(current())){mPosition++;}
+
+        std::string identifier = mSource.substr(mStart, (mPosition-mStart));
+        std::map<std::string, TokenType>::iterator it = keywords.find(identifier);
+
+        if(it == keywords.end()) { 
+            std::ostringstream err;
+            err << "Undefined identifier '" << identifier << "'";
+            alert(err.str(), mLine);
+            return;
+        }
+
+        addToken(it->second);
+        return;
+
     }
 
     switch (curr)
@@ -163,5 +187,9 @@ void Lexer::addToken(TokenType type){
 }
 
 void Lexer::addToken(TokenType type, const std::string& lexeme){
-    mTokens.push_back(SyntaxToken(type, lexeme, mPosition));
+    mTokens.push_back(SyntaxToken(type, lexeme, mStart));
+}
+
+void Lexer::addToken(TokenType type, const std::string& lexeme, int position){
+    mTokens.push_back(SyntaxToken(type, lexeme, position));
 }
