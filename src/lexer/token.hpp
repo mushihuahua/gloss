@@ -20,6 +20,8 @@ enum TokenType {
     LessThanToken, LessThanEqualToken,
     GreaterThanToken, GreaterThanEqualToken,
 
+    IfToken, ElseToken,
+
     UnknownToken,
     WhitespaceToken,
     EOFToken

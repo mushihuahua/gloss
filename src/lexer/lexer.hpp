@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include "token.hpp"
 
 class Lexer{
@@ -20,6 +21,7 @@ class Lexer{
 
         void addToken(TokenType type);
         void addToken(TokenType type, const std::string& lexeme);
+        void addToken(TokenType type, const std::string& lexeme, int position);
 
         bool match(char expected);
     
