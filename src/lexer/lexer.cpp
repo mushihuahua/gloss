@@ -95,10 +95,32 @@ void Lexer::scanToken(){
         case '/':
             if(match('/')){
                 while(current() != '\n' && !isEOF()){ mPosition++; }
+            } 
+
+            else if(match('*')){
+                while(!isEOF()){
+                    if(current() == '*'){
+                        mPosition++;
+                        if(match('/')){
+                            break;
+                        }
+                    }
+
+                    if(current() == '\n'){ mLine++; }
+                    mPosition++;
+                }
+
+                if(isEOF()){
+                    alert("Unterminated comment", mLine);
+                    break;
+                }
+
             } else {
                 addToken(DivideToken);
             }
+
             break;
+
 
         case '"':
             while(current() != '"' && !isEOF()){
