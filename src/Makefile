@@ -1,5 +1,5 @@
 CC:=clang++
-CFLAGS:=-Wall -c
+CFLAGS:=-Wall -c -I../include/
 
 DEBUGFLAGS:= 
 
@@ -12,21 +12,21 @@ debug: DEBUGFLAGS += -g
 debug: CFLAGS += $(DEBUGFLAGS)
 debug: main
 
-main: main.o ./lexer/lexer.o ./lexer/token.o alerts.o
-	$(CC) $(DEBUGFLAGS) $(OBJS) -o main
+main: $(OBJS)
+	$(CC) $(DEBUGFLAGS) $(OBJS) -o gloss
 	$(info CREATED main)
 
 main.o:	main.cpp
 	$(CC) $(CFLAGS) main.cpp
 
-./lexer/lexer.o: ./lexer/lexer.cpp ./lexer/lexer.hpp
+lexer.o: ./lexer/lexer.cpp ./lexer/lexer.hpp
 	$(CC) $(CFLAGS) lexer/lexer.cpp
 
-./lexer/token.o: ./lexer/token.cpp ./lexer/token.hpp
+token.o: ./lexer/token.cpp ./lexer/token.hpp
 	$(CC) $(CFLAGS) lexer/token.cpp
 
 alerts.o: alerts.cpp alerts.hpp
 	$(CC) $(CFLAGS) alerts.cpp
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJS) gloss
