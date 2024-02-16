@@ -2,11 +2,17 @@
 != == >= <= !!
 +   +   -
 
+/* this is a multiline comment
+hi
+*/
+
 // this is a comment
 (( )){} // grouping stuff
 !*+-/=<> <= == // operators
 
-"this is a string on line 9"
+a b c
+
+"this is a string on line 15"
 
 56.98 76
 78

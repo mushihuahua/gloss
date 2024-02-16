@@ -58,7 +58,7 @@ void Lexer::scanToken(){
 
     mStart = mPosition;
     char curr = current();
-     mPosition++;
+    mPosition++;
 
     if(isdigit(curr)){
         while(isdigit(current())){mPosition++;}
@@ -187,9 +187,9 @@ void Lexer::addToken(TokenType type){
 }
 
 void Lexer::addToken(TokenType type, const std::string& lexeme){
-    mTokens.push_back(SyntaxToken(type, lexeme, mStart));
+    mTokens.push_back(SyntaxToken(type, lexeme, mStart, mLine));
 }
 
 void Lexer::addToken(TokenType type, const std::string& lexeme, int position){
-    mTokens.push_back(SyntaxToken(type, lexeme, position));
+    mTokens.push_back(SyntaxToken(type, lexeme, position, mLine));
 }

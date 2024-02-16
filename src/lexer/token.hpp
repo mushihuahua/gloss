@@ -32,8 +32,9 @@ class SyntaxToken{
         const TokenType mType;
         const std::string mLexeme;
         const int mPosition;
+        const int mLine;
     public:
-        SyntaxToken(TokenType type, const std::string& lexeme, int position);
+        SyntaxToken(TokenType type, const std::string& lexeme, int position, int line);
         void display();
         TokenType getType() const;
         std::string getLexeme() const;
