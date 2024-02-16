@@ -1,0 +1,18 @@
+// this is a comment and anything on this line will be ignored + = == !=
+!= == >= <= !!
++   +   -
+
+/* this is a multiline comment
+hi
+*/
+
+// this is a comment
+(( )){} // grouping stuff
+!*+-/=<> <= == // operators
+
+a b c
+
+"this is a string on line 15"
+
+56.98 76
+78
