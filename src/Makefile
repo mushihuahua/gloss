@@ -4,7 +4,7 @@ CFLAGS:=-Wall -c -I../include/
 DEBUGFLAGS:= 
 
 RM:= rm -f
-OBJS:= main.o lexer.o token.o alerts.o
+OBJS:= main.o ./lexer/lexer.o ./lexer/token.o alerts.o ast.o
 
 all: main
 
@@ -16,17 +16,11 @@ main: $(OBJS)
 	$(CC) $(DEBUGFLAGS) $(OBJS) -o gloss
 	$(info CREATED main)
 
-main.o:	main.cpp
-	$(CC) $(CFLAGS) main.cpp
+%.o : %.cpp
+	$(CC) $(CFLAGS) $< -o $@
 
-lexer.o: ./lexer/lexer.cpp ./lexer/lexer.hpp
-	$(CC) $(CFLAGS) lexer/lexer.cpp
-
-token.o: ./lexer/token.cpp ./lexer/token.hpp
-	$(CC) $(CFLAGS) lexer/token.cpp
-
-alerts.o: alerts.cpp alerts.hpp
-	$(CC) $(CFLAGS) alerts.cpp
+ast.o: parser/ASTs/ExprAST.hpp parser/visitors/AstPrinterVisitor.cpp
+	$(CC) $(CFLAGS) parser/visitors/AstPrinterVisitor.cpp -o ast.o
 
 clean:
 	$(RM) $(OBJS) gloss
