@@ -4,6 +4,9 @@
 #include <sstream>
 
 #include "lexer/lexer.hpp"
+#include "parser/parser.hpp"
+#include "parser/visitors/AstPrinterVisitor.hpp"
+#include "parser/ASTs/ExprAST.hpp"
 #include "alerts.hpp"
 
 void run(const std::string& line);
@@ -70,7 +73,17 @@ void runFile(const char * path){
 void run(const std::string& line){
 
     Lexer lx = Lexer(line);
-    std::vector tokens = lx.scanTokens();
+    std::vector<SyntaxToken> tokens = lx.scanTokens();
+
+    Parser parser = Parser(tokens);
+    std::unique_ptr<ExprAST> expression = parser.parse();
+
+    if(expression == nullptr){
+        return;
+    }
+
+    AstPrinterVisitor printer = AstPrinterVisitor();
+    printer.print(expression.get());
  
     for(auto & token : tokens){
         token.display();
