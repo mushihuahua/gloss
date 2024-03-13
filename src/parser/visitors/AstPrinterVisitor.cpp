@@ -6,6 +6,7 @@
 
 void AstPrinterVisitor::print(ExprAST* expr) {
     expr->accept(*this);
+    std::cout << std::endl;
 }
 
 void AstPrinterVisitor::visit(const BinaryExprAST* expr) { 
@@ -13,10 +14,6 @@ void AstPrinterVisitor::visit(const BinaryExprAST* expr) {
     expr->mRight->accept(*this);
     std::cout << expr->mOperator.getLexeme() << " ";
 
-}
-
-void AstPrinterVisitor::visit(const LiteralExprAST* expr) { 
-    std::cout << *(int*)(expr->mValue) << " ";
 }
 
 void AstPrinterVisitor::visit(const UnaryExprAST* expr) { 

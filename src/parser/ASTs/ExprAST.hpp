@@ -6,6 +6,7 @@
 
 class BinaryExprAST;
 class GroupingExprAST;
+template<typename T>
 class LiteralExprAST;
 class UnaryExprAST;
 
@@ -14,7 +15,8 @@ class Visitor {
         virtual ~Visitor() = default;
         virtual void visit(const BinaryExprAST* expr)  = 0;
         virtual void visit(const GroupingExprAST* expr)  = 0;
-        virtual void visit(const LiteralExprAST* expr)  = 0;
+        virtual void visit(const LiteralExprAST<double>* expr) = 0;
+        virtual void visit(const LiteralExprAST<std::string>* expr) = 0;
         virtual void visit(const UnaryExprAST* expr)  = 0;
 };
 
@@ -48,11 +50,12 @@ class GroupingExprAST : public ExprAST {
     }
 };
 
+template<typename T>
 class LiteralExprAST : public ExprAST {
     public:
-        void* mValue;
+        T mValue;
 
-    LiteralExprAST(void* value) : mValue(value) {}
+    LiteralExprAST(T value) : mValue(value) {}
 
     void accept(Visitor& visitor) const override {
         visitor.visit(this);

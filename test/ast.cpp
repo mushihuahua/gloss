@@ -2,8 +2,6 @@
 
 int main(int argc, char const *argv[])
 {
-
-
     BinaryExprAST* binaryExpr = new BinaryExprAST(
         SyntaxToken(TokenType::MultiplyToken, "*", 0, 0),
         std::make_unique<GroupingExprAST>(
