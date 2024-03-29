@@ -16,3 +16,7 @@ TokenType SyntaxToken::getType() const{
 std::string SyntaxToken::getLexeme() const{
     return mLexeme;
 }
+
+int SyntaxToken::getLine() const{
+    return mLine;
+}

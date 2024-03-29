@@ -15,7 +15,7 @@ class ParseError : public std::exception {
     std::string message;
 
     public:
-    ParseError(const std::string& msg) : message(msg) {}
+    ParseError(const std::string& msg = "") : message(msg) {}
     const char* what() const noexcept override {
         return message.c_str();
     }
@@ -28,7 +28,7 @@ class Parser{
         std::vector<SyntaxToken> mTokens;
         size_t mPosition = 0;
 
-        void consumeToken(TokenType type);
+        void consumeToken(TokenType type, std::string errMsg);
         bool match(std::vector<TokenType> types);
         void advance();
         SyntaxToken peek(int offset = 0);

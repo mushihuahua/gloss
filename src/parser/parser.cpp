@@ -1,4 +1,7 @@
+#include <string.h>
+
 #include "parser.hpp"
+#include "../alerts.hpp"
 
 Parser::Parser(std::vector<SyntaxToken>& tokens) : mTokens(tokens) {
     if (!mTokens.empty() && mPosition < mTokens.size()) {
@@ -16,12 +19,13 @@ SyntaxToken Parser::peek(int offset){
     return mTokens.at(index);
 }
 
-void Parser::consumeToken(TokenType type){
+void Parser::consumeToken(TokenType type, std::string errMsg){
 
     if(peek().getType() == type && peek().getType() != TokenType::EOFToken){
         advance();
     } else {
-        throw ParseError("Unexpected token");
+        alert(errMsg, peek().getLine());
+        throw ParseError();
     }
     
 }
@@ -114,7 +118,7 @@ std::unique_ptr<ExprAST> Parser::primary(){
 
     if(match({TokenType::LParenToken})){
         std::unique_ptr<ExprAST> expr = parse();
-        consumeToken(TokenType::RParenToken);
+        consumeToken(TokenType::RParenToken, "Expected ')'");
         return expr;
     }
 
@@ -128,7 +132,9 @@ std::unique_ptr<ExprAST> Parser::parse(){
     }
     catch(const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        if(!(e.what()[0] == '\0')) {
+            std::cerr << e.what() << '\n';
+        }
         return nullptr;
     }
 }
