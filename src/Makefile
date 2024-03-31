@@ -1,5 +1,5 @@
 CC:=clang++
-CFLAGS:=-Wall -c -I../include/
+CFLAGS:=-Wall -std=c++17 -c -I../include/
 
 DEBUGFLAGS:= 
 
