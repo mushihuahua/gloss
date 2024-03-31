@@ -29,9 +29,13 @@ class Parser{
         size_t mPosition = 0;
 
         void consumeToken(TokenType type, std::string errMsg);
+        void checkExpr(const std::unique_ptr<ExprAST>& expr, std::string errMsg);
+        std::unique_ptr<ExprAST> parseBinaryExpr(std::unique_ptr<ExprAST> expr, std::function<std::unique_ptr<ExprAST>()> parseFunc);
+
         bool match(std::vector<TokenType> types);
         void advance();
         SyntaxToken peek(int offset = 0);
+        void synchronise();
 
         /*  
         Current Basic Grammar:

@@ -3,6 +3,15 @@
 #include "parser.hpp"
 #include "../alerts.hpp"
 
+std::string expectedExpression(const char* position, const char* token) {
+    std::string message = "Expected expression ";
+    message += position;
+    message += " '";
+    message += token;
+    message += "' token";
+    return message;
+}
+
 Parser::Parser(std::vector<SyntaxToken>& tokens) : mTokens(tokens) {
     if (!mTokens.empty() && mPosition < mTokens.size()) {
         mCurrentToken = mTokens.at(mPosition);
@@ -30,6 +39,23 @@ void Parser::consumeToken(TokenType type, std::string errMsg){
     
 }
 
+void Parser::checkExpr(const std::unique_ptr<ExprAST>& expr, std::string errMsg){
+    if(expr == nullptr){
+        alert(errMsg, peek().getLine());
+        throw ParseError();
+    }
+}
+
+std::unique_ptr<ExprAST> Parser::parseBinaryExpr(std::unique_ptr<ExprAST> expr, std::function<std::unique_ptr<ExprAST>()> parseFunc){
+    SyntaxToken op = peek(-1);
+    checkExpr(expr, expectedExpression("before", op.getLexeme().c_str()));
+    std::unique_ptr<ExprAST> right = parseFunc();
+    checkExpr(right, expectedExpression("after", op.getLexeme().c_str()));
+    expr = std::make_unique<BinaryExprAST>(op, std::move(expr), std::move(right));
+
+    return expr;
+}
+
 bool Parser::match(std::vector<TokenType> types){
     for(TokenType type : types){
         if(peek().getType() == type && peek().getType() != TokenType::EOFToken){
@@ -53,9 +79,7 @@ std::unique_ptr<ExprAST> Parser::equality(){
     std::unique_ptr<ExprAST> expr = comparison();
 
     while(match({TokenType::ExclamationEqualToken, TokenType::EqualEqualToken})){
-        SyntaxToken op = peek(-1);
-        std::unique_ptr<ExprAST> right = comparison();
-        expr = std::make_unique<BinaryExprAST>(op, std::move(expr), std::move(right));
+        expr = parseBinaryExpr(std::move(expr), [&](){ return comparison(); });
     }
 
     return expr;
@@ -66,9 +90,7 @@ std::unique_ptr<ExprAST> Parser::comparison(){
 
     while(match({TokenType::GreaterThanToken, TokenType::GreaterThanEqualToken, 
                  TokenType::LessThanToken, TokenType::LessThanEqualToken})){
-        SyntaxToken op = peek(-1);
-        std::unique_ptr<ExprAST> right = term();
-        expr = std::make_unique<BinaryExprAST>(op, std::move(expr), std::move(right));
+        expr = parseBinaryExpr(std::move(expr), [&](){ return term(); });
     }
 
     return expr;
@@ -78,9 +100,7 @@ std::unique_ptr<ExprAST> Parser::term(){
     std::unique_ptr<ExprAST> expr = factor();
 
     while(match({TokenType::MinusToken, TokenType::PlusToken})){
-        SyntaxToken op = peek(-1);
-        std::unique_ptr<ExprAST> right = factor();
-        expr = std::make_unique<BinaryExprAST>(op, std::move(expr), std::move(right));
+        expr = parseBinaryExpr(std::move(expr), [&](){ return factor(); });
     }
 
     return expr;
@@ -90,18 +110,17 @@ std::unique_ptr<ExprAST> Parser::factor(){
     std::unique_ptr<ExprAST> expr = unary();
 
     while(match({TokenType::DivideToken, TokenType::MultiplyToken})){
-        SyntaxToken op = peek(-1);
-        std::unique_ptr<ExprAST> right = unary();
-        expr = std::make_unique<BinaryExprAST>(op, std::move(expr), std::move(right));
+        expr = parseBinaryExpr(std::move(expr), [&](){ return unary(); });
     }
 
     return expr;
 }
 
 std::unique_ptr<ExprAST> Parser::unary(){
-    if(match({TokenType::MinusToken, TokenType::ExclamationToken})){
+    if(match({TokenType::MinusToken, TokenType::PlusToken, TokenType::ExclamationToken})){
         SyntaxToken op = peek(-1);
         std::unique_ptr<ExprAST> right = unary();
+        checkExpr(right, "Invalid syntax");
         return std::make_unique<UnaryExprAST>(op, std::move(right));
     }
 
@@ -122,7 +141,7 @@ std::unique_ptr<ExprAST> Parser::primary(){
         return expr;
     }
 
-    throw ParseError("Unexpected token");
+    return nullptr;
 }
 
 std::unique_ptr<ExprAST> Parser::parse(){
@@ -136,5 +155,15 @@ std::unique_ptr<ExprAST> Parser::parse(){
             std::cerr << e.what() << '\n';
         }
         return nullptr;
+    }
+}
+
+void Parser::synchronise(){
+    while(peek().getType() != TokenType::EOFToken){
+        if(peek().getType() == TokenType::SemicolonToken){
+            advance();
+            return;
+        }
+        advance();
     }
 }
