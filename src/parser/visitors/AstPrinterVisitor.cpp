@@ -40,3 +40,11 @@ inline std::any AstPrinterVisitor::visit(const LiteralExprAST<double>* expr){
 inline std::any AstPrinterVisitor::visit(const LiteralExprAST<std::string>* expr){
     return (expr->mValue);
 }
+
+inline std::any AstPrinterVisitor::visit(const LiteralExprAST<bool>* expr){
+    return (expr->mValue) ? std::string("true") : std::string("false");
+}
+
+inline std::any AstPrinterVisitor::visit(const LiteralExprAST<std::nullptr_t>* expr){
+    return std::string("nil");
+}

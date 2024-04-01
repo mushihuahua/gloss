@@ -36,6 +36,15 @@ std::any Interpreter::visit(const GroupingExprAST* expr) {
     return expr->mExpr->accept(*this);
 }
 
+bool isTruthy(std::any value){
+    if(value.type() == typeid(std::nullptr_t)){ return false; }
+    if(value.type() == typeid(bool)){ return std::any_cast<bool>(value); }
+
+    if(value.type() == typeid(double)){ return std::any_cast<double>(value) != 0; }
+
+    return true;
+}
+
 std::any Interpreter::visit(const UnaryExprAST* expr) {
     std::any right = expr->mRight->accept(*this);
 
@@ -43,6 +52,9 @@ std::any Interpreter::visit(const UnaryExprAST* expr) {
     {
     case TokenType::MinusToken:
         return -std::any_cast<double>(right);
+
+    case TokenType::ExclamationToken:
+        return !isTruthy(right);
 
     default:
         break;
@@ -59,6 +71,13 @@ std::any Interpreter::visit(const LiteralExprAST<std::string>* expr) {
     return expr->mValue;
 }
 
+std::any Interpreter::visit(const LiteralExprAST<bool>* expr) {
+    return expr->mValue;
+}
+
+std::any Interpreter::visit(const LiteralExprAST<std::nullptr_t>* expr) {
+    return nullptr;
+}
 
 void Interpreter::interpret(ExprAST* expr) {
     std::cout << "Interpreting\n";
@@ -68,5 +87,9 @@ void Interpreter::interpret(ExprAST* expr) {
         std::cout << std::any_cast<double>(value) << std::endl;
     } else if(value.type() == typeid(std::string)){
         std::cout << std::any_cast<std::string>(value) << std::endl;
+    } else if(value.type() == typeid(bool)){
+        std::cout << std::any_cast<bool>(value) << std::endl;
+    } else if(value.type() == typeid(std::nullptr_t)){
+        std::cout << "nil" << std::endl;
     }
 }

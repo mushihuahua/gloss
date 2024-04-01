@@ -12,6 +12,8 @@ class AstPrinterVisitor : public Visitor{
 
         inline std::any visit(const LiteralExprAST<double>* expr) override;
         inline std::any visit(const LiteralExprAST<std::string>* expr) override;
+        inline std::any visit(const LiteralExprAST<bool>* expr) override;
+        inline std::any visit(const LiteralExprAST<std::nullptr_t>* expr) override;
 
         AstPrinterVisitor() {};
 };

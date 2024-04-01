@@ -128,13 +128,17 @@ std::unique_ptr<ExprAST> Parser::unary(){
 }
 
 std::unique_ptr<ExprAST> Parser::primary(){
-    if(match({TokenType::NumberToken})){
-        return std::make_unique<LiteralExprAST<double>>(std::stod(peek(-1).getLexeme()));
-    } 
-    if(match({TokenType::StringToken})){
-        return std::make_unique<LiteralExprAST<std::string>>(peek(-1).getLexeme());
-    }
 
+    // Number and String literals
+    if(match({TokenType::NumberToken})){ return std::make_unique<LiteralExprAST<double>>(std::stod(peek(-1).getLexeme())); } 
+    if(match({TokenType::StringToken})){ return std::make_unique<LiteralExprAST<std::string>>(peek(-1).getLexeme()); }
+
+    // Boolean and Nil literals
+    if(match({TokenType::TrueToken})){ return std::make_unique<LiteralExprAST<bool>>(true); }
+    if (match({TokenType::FalseToken})){ return std::make_unique<LiteralExprAST<bool>>(false); }
+    if(match({TokenType::NilToken})){ return std::make_unique<LiteralExprAST<std::nullptr_t>>(nullptr); }
+
+    // Grouping of expressions
     if(match({TokenType::LParenToken})){
         std::unique_ptr<ExprAST> expr = parse();
         consumeToken(TokenType::RParenToken, "Expected ')'");

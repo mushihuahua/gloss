@@ -20,6 +20,8 @@ class Visitor {
 
         virtual std::any visit(const LiteralExprAST<double>* expr) = 0;
         virtual std::any visit(const LiteralExprAST<std::string>* expr) = 0;
+        virtual std::any visit(const LiteralExprAST<bool>* expr) = 0;
+        virtual std::any visit(const LiteralExprAST<std::nullptr_t>* expr) = 0;
 };
 
 class ExprAST {

@@ -22,6 +22,8 @@ enum TokenType {
 
     IfToken, ElseToken,
 
+    TrueToken, FalseToken, NilToken,
+
     UnknownToken,
     WhitespaceToken,
     EOFToken
