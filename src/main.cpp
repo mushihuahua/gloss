@@ -6,6 +6,7 @@
 #include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
 #include "parser/visitors/AstPrinterVisitor.hpp"
+#include "parser/interpreter.hpp"
 #include "parser/ASTs/ExprAST.hpp"
 #include "alerts.hpp"
 
@@ -84,6 +85,9 @@ void run(const std::string& line){
 
     AstPrinterVisitor printer = AstPrinterVisitor();
     printer.print(expression.get());
+
+    Interpreter interpreter = Interpreter();
+    interpreter.interpret(expression.get());
  
     for(auto & token : tokens){
         token.display();
