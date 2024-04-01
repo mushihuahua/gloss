@@ -41,6 +41,7 @@ bool isTruthy(std::any value){
     if(value.type() == typeid(bool)){ return std::any_cast<bool>(value); }
 
     if(value.type() == typeid(double)){ return std::any_cast<double>(value) != 0; }
+    if(value.type() == typeid(std::string)){ return std::any_cast<std::string>(value) != ""; }
 
     return true;
 }
@@ -52,6 +53,9 @@ std::any Interpreter::visit(const UnaryExprAST* expr) {
     {
     case TokenType::MinusToken:
         return -std::any_cast<double>(right);
+
+    case TokenType::PlusToken:
+        return std::any_cast<double>(right);
 
     case TokenType::ExclamationToken:
         return !isTruthy(right);
