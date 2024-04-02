@@ -38,7 +38,7 @@ inline std::any AstPrinterVisitor::visit(const LiteralExprAST<double>* expr){
 }
 
 inline std::any AstPrinterVisitor::visit(const LiteralExprAST<std::string>* expr){
-    return (expr->mValue);
+    return "\"" + expr->mValue + "\"";
 }
 
 inline std::any AstPrinterVisitor::visit(const LiteralExprAST<bool>* expr){

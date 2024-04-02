@@ -5,7 +5,10 @@
 class AstPrinterVisitor : public Visitor{
 
     public:
+        AstPrinterVisitor() {};
         void print(ExprAST* expr);
+
+    private:
         std::any visit(const BinaryExprAST* expr)  override;
         std::any visit(const GroupingExprAST* expr)  override;
         std::any visit(const UnaryExprAST* expr)  override;
@@ -14,6 +17,4 @@ class AstPrinterVisitor : public Visitor{
         inline std::any visit(const LiteralExprAST<std::string>* expr) override;
         inline std::any visit(const LiteralExprAST<bool>* expr) override;
         inline std::any visit(const LiteralExprAST<std::nullptr_t>* expr) override;
-
-        AstPrinterVisitor() {};
 };

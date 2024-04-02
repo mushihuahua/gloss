@@ -10,6 +10,8 @@
 #include "parser/ASTs/ExprAST.hpp"
 #include "alerts.hpp"
 
+bool hadRuntimeError = false;
+
 void run(const std::string& line);
 void runPrompt();
 void runFile(const char* path);
@@ -69,6 +71,10 @@ void runFile(const char * path){
     buffer << sourceCode.rdbuf();
 
     run(buffer.str()); 
+
+    if(hadRuntimeError){
+        exit(70);
+    }
 }
 
 void run(const std::string& line){
@@ -87,7 +93,7 @@ void run(const std::string& line){
     printer.print(expression.get());
 
     Interpreter interpreter = Interpreter();
-    interpreter.interpret(expression.get());
+    interpreter.interpret(expression.get(), hadRuntimeError);
  
     for(auto & token : tokens){
         token.display();
