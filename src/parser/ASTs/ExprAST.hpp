@@ -11,9 +11,9 @@ template<typename T>
 class LiteralExprAST;
 class UnaryExprAST;
 
-class Visitor {
+class ExprVisitor {
     public:
-        virtual ~Visitor() = default;
+        virtual ~ExprVisitor() = default;
         virtual std::any visit(const BinaryExprAST* expr)  = 0;
         virtual std::any visit(const GroupingExprAST* expr)  = 0;
         virtual std::any visit(const UnaryExprAST* expr)  = 0;
@@ -27,7 +27,7 @@ class Visitor {
 class ExprAST {
     public:
         virtual ~ExprAST() = default;
-        virtual std::any accept(Visitor& visitor) const = 0;
+        virtual std::any accept(ExprVisitor& visitor) const = 0;
 };
 
 class BinaryExprAST : public ExprAST {
@@ -38,7 +38,7 @@ class BinaryExprAST : public ExprAST {
     BinaryExprAST(SyntaxToken Op, std::unique_ptr<ExprAST> left, std::unique_ptr<ExprAST> right) 
                 : mOperator(Op), mLeft(std::move(left)), mRight(std::move(right)) {}
 
-    std::any accept(Visitor& visitor) const override {
+    std::any accept(ExprVisitor& visitor) const override {
         return visitor.visit(this);
     }
 };
@@ -49,7 +49,7 @@ class GroupingExprAST : public ExprAST {
 
     GroupingExprAST(std::unique_ptr<ExprAST>  Expr) : mExpr(std::move(Expr)) {}
 
-    std::any accept(Visitor& visitor) const override {
+    std::any accept(ExprVisitor& visitor) const override {
         return visitor.visit(this);
     }
 };
@@ -61,7 +61,7 @@ class LiteralExprAST : public ExprAST {
 
     LiteralExprAST(T value) : mValue(value) {}
 
-    std::any accept(Visitor& visitor) const override {
+    std::any accept(ExprVisitor& visitor) const override {
         return visitor.visit(this);
     }
 };
@@ -74,7 +74,7 @@ class UnaryExprAST : public ExprAST {
     UnaryExprAST(SyntaxToken Op, std::unique_ptr<ExprAST> right) 
                 : mOperator(Op), mRight(std::move(right)) {}
 
-    std::any accept(Visitor& visitor) const override {
+    std::any accept(ExprVisitor& visitor) const override {
         return visitor.visit(this);
     }
 };

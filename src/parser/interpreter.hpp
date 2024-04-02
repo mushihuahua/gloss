@@ -11,7 +11,7 @@ class RuntimeError : public std::runtime_error {
         RuntimeError(SyntaxToken token, const std::string& msg) : std::runtime_error(msg), mToken(token) {}
 };
 
-class Interpreter : public Visitor {
+class Interpreter : public ExprVisitor {
     private:
 
         std::any visit(const BinaryExprAST* expr) override;
