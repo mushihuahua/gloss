@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include "../../lexer/token.hpp"
+#include <any>
 
 class BinaryExprAST;
 class GroupingExprAST;
@@ -13,17 +14,20 @@ class UnaryExprAST;
 class Visitor {
     public:
         virtual ~Visitor() = default;
-        virtual void visit(const BinaryExprAST* expr)  = 0;
-        virtual void visit(const GroupingExprAST* expr)  = 0;
-        virtual void visit(const LiteralExprAST<double>* expr) = 0;
-        virtual void visit(const LiteralExprAST<std::string>* expr) = 0;
-        virtual void visit(const UnaryExprAST* expr)  = 0;
+        virtual std::any visit(const BinaryExprAST* expr)  = 0;
+        virtual std::any visit(const GroupingExprAST* expr)  = 0;
+        virtual std::any visit(const UnaryExprAST* expr)  = 0;
+
+        virtual std::any visit(const LiteralExprAST<double>* expr) = 0;
+        virtual std::any visit(const LiteralExprAST<std::string>* expr) = 0;
+        virtual std::any visit(const LiteralExprAST<bool>* expr) = 0;
+        virtual std::any visit(const LiteralExprAST<std::nullptr_t>* expr) = 0;
 };
 
 class ExprAST {
     public:
         virtual ~ExprAST() = default;
-        virtual void accept(Visitor& visitor) const = 0;
+        virtual std::any accept(Visitor& visitor) const = 0;
 };
 
 class BinaryExprAST : public ExprAST {
@@ -34,8 +38,8 @@ class BinaryExprAST : public ExprAST {
     BinaryExprAST(SyntaxToken Op, std::unique_ptr<ExprAST> left, std::unique_ptr<ExprAST> right) 
                 : mOperator(Op), mLeft(std::move(left)), mRight(std::move(right)) {}
 
-    void accept(Visitor& visitor) const override {
-        visitor.visit(this);
+    std::any accept(Visitor& visitor) const override {
+        return visitor.visit(this);
     }
 };
 
@@ -45,8 +49,8 @@ class GroupingExprAST : public ExprAST {
 
     GroupingExprAST(std::unique_ptr<ExprAST>  Expr) : mExpr(std::move(Expr)) {}
 
-    void accept(Visitor& visitor) const override {
-        visitor.visit(this);
+    std::any accept(Visitor& visitor) const override {
+        return visitor.visit(this);
     }
 };
 
@@ -57,8 +61,8 @@ class LiteralExprAST : public ExprAST {
 
     LiteralExprAST(T value) : mValue(value) {}
 
-    void accept(Visitor& visitor) const override {
-        visitor.visit(this);
+    std::any accept(Visitor& visitor) const override {
+        return visitor.visit(this);
     }
 };
 
@@ -70,7 +74,7 @@ class UnaryExprAST : public ExprAST {
     UnaryExprAST(SyntaxToken Op, std::unique_ptr<ExprAST> right) 
                 : mOperator(Op), mRight(std::move(right)) {}
 
-    void accept(Visitor& visitor) const override {
-        visitor.visit(this);
+    std::any accept(Visitor& visitor) const override {
+        return visitor.visit(this);
     }
 };

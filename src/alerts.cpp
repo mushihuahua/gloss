@@ -12,3 +12,7 @@ void alert(std::string message, std::string file){
 void alert(std::string message, int line){
     std::cerr << "[line " << line << "]" << " | " << "[error]: " << message << std::endl;
 }
+
+void runtimeAlert(const SyntaxToken& token, const std::string& msg){
+    alert(msg, token.getLine());
+}

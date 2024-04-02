@@ -4,7 +4,7 @@ CFLAGS:=-Wall -std=c++17 -c -I../include/
 DEBUGFLAGS:= 
 
 RM:= rm -f
-OBJS:= main.o ./lexer/lexer.o ./lexer/token.o alerts.o ast.o
+OBJS:= main.o ./lexer/lexer.o ./lexer/token.o alerts.o ast.o parser/parser.o parser/interpreter.o 
 
 all: main
 

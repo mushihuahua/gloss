@@ -22,6 +22,8 @@ enum TokenType {
 
     IfToken, ElseToken,
 
+    TrueToken, FalseToken, NilToken,
+
     UnknownToken,
     WhitespaceToken,
     EOFToken
@@ -38,4 +40,11 @@ class SyntaxToken{
         void display();
         TokenType getType() const;
         std::string getLexeme() const;
+        int getLine() const;
+
+        SyntaxToken& operator=(const SyntaxToken& other) {
+            return *this;
+        }
+
 };
+

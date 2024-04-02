@@ -6,7 +6,10 @@
 std::map<std::string, TokenType> keywords
 {
     {"if", IfToken},
-    {"else", ElseToken}
+    {"else", ElseToken},
+    {"true", TrueToken},
+    {"false", FalseToken},
+    {"nil", NilToken}
 };
 
 Lexer::Lexer(const std::string& source)

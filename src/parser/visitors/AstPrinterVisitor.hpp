@@ -5,19 +5,16 @@
 class AstPrinterVisitor : public Visitor{
 
     public:
-        void print(ExprAST* expr);
-        void visit(const BinaryExprAST* expr)  override;
-        void visit(const GroupingExprAST* expr)  override;
-        // template<typename T>
-        inline void visit(const LiteralExprAST<double>* expr)  override
-        {
-            std::cout << (expr->mValue) << " ";
-        }
-        inline void visit(const LiteralExprAST<std::string>* expr)  override
-        {
-            std::cout << (expr->mValue) << " ";
-        }
-        void visit(const UnaryExprAST* expr)  override;
-
         AstPrinterVisitor() {};
+        void print(ExprAST* expr);
+
+    private:
+        std::any visit(const BinaryExprAST* expr)  override;
+        std::any visit(const GroupingExprAST* expr)  override;
+        std::any visit(const UnaryExprAST* expr)  override;
+
+        inline std::any visit(const LiteralExprAST<double>* expr) override;
+        inline std::any visit(const LiteralExprAST<std::string>* expr) override;
+        inline std::any visit(const LiteralExprAST<bool>* expr) override;
+        inline std::any visit(const LiteralExprAST<std::nullptr_t>* expr) override;
 };
