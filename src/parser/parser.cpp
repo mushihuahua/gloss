@@ -78,10 +78,6 @@ std::unique_ptr<ExprAST> Parser::expression(){
 
 std::unique_ptr<StmtAST> Parser::statement(){
     if(match({TokenType::PrintToken})){ 
-        if(peek().getType() != TokenType::LParenToken){
-            alert("Expected parentheses after 'print'", peek().getLine());
-            throw ParseError();
-        }
         std::unique_ptr<StmtAST> stmt = printStmt();
         return stmt; 
     }
@@ -95,8 +91,11 @@ std::unique_ptr<StmtAST> Parser::exprStmt(){
 }
 
 std::unique_ptr<StmtAST> Parser::printStmt(){
+    if(peek().getType() != TokenType::LParenToken){
+        alert("Expected parentheses after 'print'", peek().getLine());
+        throw ParseError();
+    }
     std::unique_ptr<ExprAST> expr = expression();
-    
     if(peek(-1).getType() != TokenType::RParenToken){
         alert("Expected ')' after expression", peek().getLine());
         throw ParseError();
@@ -185,7 +184,7 @@ std::vector<std::unique_ptr<StmtAST>> Parser::parse(){
         try{
             statements.push_back(statement());
         } catch(ParseError& e){
-            std::cerr << e.what() << std::endl;
+            synchronise();
         }
     }
 

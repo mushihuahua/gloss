@@ -149,10 +149,14 @@ std::string stringify(std::any value){
 }
 
 std::any Interpreter::visit(const ExpressionStmtAST* stmt) {
+    if(stmt->mExpr == nullptr) return nullptr;
+    
     return stmt->mExpr->accept(*this);
 }
 
 std::any Interpreter::visit(const PrintStmtAST* stmt) {
+    if(stmt->mExpr == nullptr) return nullptr;
+
     std::any value = stmt->mExpr->accept(*this);
     std::cout << stringify(value) << std::endl;
     return nullptr;
