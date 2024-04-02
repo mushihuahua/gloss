@@ -2,7 +2,7 @@
 
 #include "../ASTs/ExprAST.hpp"
 
-class AstPrinterVisitor : public Visitor{
+class AstPrinterVisitor : public ExprVisitor{
 
     public:
         AstPrinterVisitor() {};

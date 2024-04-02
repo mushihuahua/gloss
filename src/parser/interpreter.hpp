@@ -1,7 +1,10 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
+#include <vector>
 #include "ASTs/ExprAST.hpp"
+#include "ASTs/StmtAST.hpp"
 #include "../lexer/token.hpp"
 #include "../alerts.hpp"
 
@@ -11,7 +14,7 @@ class RuntimeError : public std::runtime_error {
         RuntimeError(SyntaxToken token, const std::string& msg) : std::runtime_error(msg), mToken(token) {}
 };
 
-class Interpreter : public Visitor {
+class Interpreter : public ExprVisitor, public StmtVisitor {
     private:
 
         std::any visit(const BinaryExprAST* expr) override;
@@ -23,9 +26,12 @@ class Interpreter : public Visitor {
         inline std::any visit(const LiteralExprAST<bool>* expr) override;
         inline std::any visit(const LiteralExprAST<std::nullptr_t>* expr) override;
 
+        std::any visit(const ExpressionStmtAST* stmt) override;
+        std::any visit(const PrintStmtAST* stmt) override;
+
         void assertNumberOperand(const SyntaxToken& op, std::any left, std::any right);
         bool isTruthy(std::any value);
 
     public:    
-        void interpret(ExprAST* expr, bool& error);
+        void interpret(std::vector<std::unique_ptr<StmtAST>> const& stmts, bool& error);
 };

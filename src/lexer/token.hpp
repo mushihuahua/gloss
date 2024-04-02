@@ -20,7 +20,7 @@ enum TokenType {
     LessThanToken, LessThanEqualToken,
     GreaterThanToken, GreaterThanEqualToken,
 
-    IfToken, ElseToken,
+    IfToken, ElseToken, PrintToken,
 
     TrueToken, FalseToken, NilToken,
 
