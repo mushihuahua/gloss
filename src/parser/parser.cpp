@@ -1,4 +1,5 @@
 #include <string.h>
+#include <vector>
 
 #include "parser.hpp"
 #include "../alerts.hpp"
@@ -28,12 +29,12 @@ SyntaxToken Parser::peek(int offset){
     return mTokens.at(index);
 }
 
-void Parser::consumeToken(TokenType type, std::string errMsg){
+void Parser::consumeToken(TokenType type, std::string errMsg, size_t offset){
 
-    if(peek().getType() == type && peek().getType() != TokenType::EOFToken){
+    if(peek(offset).getType() == type && peek(offset).getType() != TokenType::EOFToken){
         advance();
     } else {
-        alert(errMsg, peek().getLine());
+        alert(errMsg, peek(offset).getLine());
         throw ParseError();
     }
     
@@ -73,6 +74,35 @@ void Parser::advance(){
 
 std::unique_ptr<ExprAST> Parser::expression(){
     return equality();
+}
+
+std::unique_ptr<StmtAST> Parser::statement(){
+    if(match({TokenType::PrintToken})){ 
+        if(peek().getType() != TokenType::LParenToken){
+            alert("Expected parentheses after 'print'", peek().getLine());
+            throw ParseError();
+        }
+        std::unique_ptr<StmtAST> stmt = printStmt();
+        return stmt; 
+    }
+    return exprStmt();
+}
+
+std::unique_ptr<StmtAST> Parser::exprStmt(){
+    std::unique_ptr<ExprAST> expr = expression();
+    consumeToken(TokenType::SemicolonToken, "Expected a ';'");
+    return std::make_unique<ExpressionStmtAST>(std::move(expr));
+}
+
+std::unique_ptr<StmtAST> Parser::printStmt(){
+    std::unique_ptr<ExprAST> expr = expression();
+    
+    if(peek(-1).getType() != TokenType::RParenToken){
+        alert("Expected ')' after expression", peek().getLine());
+        throw ParseError();
+    }
+    consumeToken(TokenType::SemicolonToken, "Expected a ';'");
+    return std::make_unique<PrintStmtAST>(std::move(expr));
 }
 
 std::unique_ptr<ExprAST> Parser::equality(){
@@ -140,7 +170,7 @@ std::unique_ptr<ExprAST> Parser::primary(){
 
     // Grouping of expressions
     if(match({TokenType::LParenToken})){
-        std::unique_ptr<ExprAST> expr = parse();
+        std::unique_ptr<ExprAST> expr = expression();
         consumeToken(TokenType::RParenToken, "Expected ')'");
         return expr;
     }
@@ -148,18 +178,18 @@ std::unique_ptr<ExprAST> Parser::primary(){
     return nullptr;
 }
 
-std::unique_ptr<ExprAST> Parser::parse(){
-    try
-    {
-        return expression();
-    }
-    catch(const std::exception& e)
-    {
-        if(!(e.what()[0] == '\0')) {
-            std::cerr << e.what() << '\n';
+std::vector<std::unique_ptr<StmtAST>> Parser::parse(){
+
+    std::vector<std::unique_ptr<StmtAST>> statements;
+    while(peek().getType() != TokenType::EOFToken){
+        try{
+            statements.push_back(statement());
+        } catch(ParseError& e){
+            std::cerr << e.what() << std::endl;
         }
-        return nullptr;
     }
+
+    return statements;
 }
 
 void Parser::synchronise(){

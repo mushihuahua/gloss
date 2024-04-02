@@ -8,6 +8,7 @@
 
 #include "../lexer/lexer.hpp"
 #include "ASTs/ExprAST.hpp"
+#include "ASTs/StmtAST.hpp"
 
 
 class ParseError : public std::exception {
@@ -21,14 +22,14 @@ class ParseError : public std::exception {
     }
 };
 
-class Parser{
+class Parser {
 
     private:  
         SyntaxToken mCurrentToken = SyntaxToken(TokenType::UnknownToken, "", 0, 0);
         std::vector<SyntaxToken> mTokens;
         size_t mPosition = 0;
 
-        void consumeToken(TokenType type, std::string errMsg);
+        void consumeToken(TokenType type, std::string errMsg, size_t offset = 0);
         void checkExpr(const std::unique_ptr<ExprAST>& expr, std::string errMsg);
         std::unique_ptr<ExprAST> parseBinaryExpr(std::unique_ptr<ExprAST> expr, std::function<std::unique_ptr<ExprAST>()> parseFunc);
 
@@ -40,6 +41,13 @@ class Parser{
         /*  
         Current Basic Grammar:
 
+        program        → statement* EOF ;
+
+        statement      → exprStmt | printStmt ;
+
+        exprStmt       → expression ";" ;
+        printStmt      → "print" "(" expression ")" ";" ;
+
         expression     → equality ;
         equality       → comparison ( ( "!=" | "==" ) comparison )* ;
         comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
@@ -48,6 +56,11 @@ class Parser{
         unary          → ( "!" | "-" ) unary | primary ;
         primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
         */
+
+        std::unique_ptr<StmtAST> statement();
+        std::unique_ptr<StmtAST> exprStmt();
+        std::unique_ptr<StmtAST> printStmt();
+
         std::unique_ptr<ExprAST> expression();
         std::unique_ptr<ExprAST> equality();
         std::unique_ptr<ExprAST> comparison();
@@ -59,5 +72,5 @@ class Parser{
         
     public:
         Parser(std::vector<SyntaxToken>& tokens);
-        std::unique_ptr<ExprAST> parse();
+        std::vector<std::unique_ptr<StmtAST>> parse();
 };

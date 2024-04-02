@@ -148,13 +148,27 @@ std::string stringify(std::any value){
     return "unknown type";
 }
 
-void Interpreter::interpret(ExprAST* expr, bool& error) {
+std::any Interpreter::visit(const ExpressionStmtAST* stmt) {
+    return stmt->mExpr->accept(*this);
+}
+
+std::any Interpreter::visit(const PrintStmtAST* stmt) {
+    std::any value = stmt->mExpr->accept(*this);
+    std::cout << stringify(value) << std::endl;
+    return nullptr;
+}
+
+void Interpreter::interpret(std::vector<std::unique_ptr<StmtAST>> const& stmts, bool& error) {
     std::cout << "Interpreting\n";
     try {
-        // evlaute the expression and output the result
-        std::any value =  expr->accept(*this);
-        std::cout << stringify(value) << std::endl;
-        
+
+        auto it = stmts.begin();
+
+        while(it != stmts.end()){
+            (*it)->accept(*this);
+            it++;
+        }   
+
     } catch(const RuntimeError& e){
         // if an error occurs, output the error message and set the error flag to true
         runtimeAlert(e.mToken, e.what());

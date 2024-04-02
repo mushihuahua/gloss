@@ -83,17 +83,17 @@ void run(const std::string& line){
     std::vector<SyntaxToken> tokens = lx.scanTokens();
 
     Parser parser = Parser(tokens);
-    std::unique_ptr<ExprAST> expression = parser.parse();
+    std::vector<std::unique_ptr<StmtAST>> expressions = parser.parse();
 
-    if(expression == nullptr){
-        return;
-    }
+    // if(expression == nullptr){
+    //     return;
+    // }
 
-    AstPrinterVisitor printer = AstPrinterVisitor();
-    printer.print(expression.get());
+    // AstPrinterVisitor printer = AstPrinterVisitor();
+    // printer.print(expression.get());
 
     Interpreter interpreter = Interpreter();
-    interpreter.interpret(expression.get(), hadRuntimeError);
+    interpreter.interpret(expressions, hadRuntimeError);
  
     for(auto & token : tokens){
         token.display();
