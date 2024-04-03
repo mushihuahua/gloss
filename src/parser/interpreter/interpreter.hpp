@@ -3,10 +3,10 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include "ASTs/ExprAST.hpp"
-#include "ASTs/StmtAST.hpp"
-#include "../lexer/token.hpp"
-#include "../alerts.hpp"
+#include "../ASTs/ExprAST.hpp"
+#include "../ASTs/StmtAST.hpp"
+#include "../../lexer/token.hpp"
+#include "../../alerts.hpp"
 #include "environment.hpp"
 
 class RuntimeError : public std::runtime_error {

@@ -6,7 +6,7 @@
 #include "lexer/lexer.hpp"
 #include "parser/parser.hpp"
 #include "parser/visitors/AstPrinterVisitor.hpp"
-#include "parser/interpreter.hpp"
+#include "parser/interpreter/interpreter.hpp"
 #include "parser/ASTs/ExprAST.hpp"
 #include "alerts.hpp"
 

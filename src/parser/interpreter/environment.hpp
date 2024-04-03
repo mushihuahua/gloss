@@ -4,8 +4,8 @@
 #include <map>
 #include <any>
 
-#include "../lexer/token.hpp"
-#include "../alerts.hpp"
+#include "../../lexer/token.hpp"
+#include "../../alerts.hpp"
 
 class Environment {
     private:
