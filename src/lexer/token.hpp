@@ -4,8 +4,11 @@
 #include<string>
 
 enum TokenType {
+
+    // literals 
     StringToken,
     NumberToken,
+    IdentifierToken,
 
     PlusToken, MinusToken,
     MultiplyToken, DivideToken,
@@ -20,7 +23,7 @@ enum TokenType {
     LessThanToken, LessThanEqualToken,
     GreaterThanToken, GreaterThanEqualToken,
 
-    IfToken, ElseToken, PrintToken,
+    IfToken, ElseToken, PrintToken, VarToken,
 
     TrueToken, FalseToken, NilToken,
 

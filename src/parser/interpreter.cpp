@@ -162,6 +162,20 @@ std::any Interpreter::visit(const PrintStmtAST* stmt) {
     return nullptr;
 }
 
+std::any Interpreter::visit(const VarStmtAST* stmt) {
+    std::any value = nullptr;
+    if(stmt->mInitialiser != nullptr){
+        value = stmt->mInitialiser->accept(*this);
+    }
+
+    mEnvironment.define(stmt->mIdentifier.getLexeme(), value);
+    return nullptr;
+}
+
+std::any Interpreter::visit(const VariableExprAST* expr) {
+    return mEnvironment.get(expr->mIdentifier);
+}
+
 void Interpreter::interpret(std::vector<std::unique_ptr<StmtAST>> const& stmts, bool& error) {
     std::cout << "Interpreting\n";
     try {

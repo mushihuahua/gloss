@@ -84,6 +84,26 @@ std::unique_ptr<StmtAST> Parser::statement(){
     return exprStmt();
 }
 
+std::unique_ptr<StmtAST> Parser::declaration(){
+    if(match({TokenType::VarToken})){
+        return varDecl();
+    }
+    return statement();
+}
+
+std::unique_ptr<StmtAST> Parser::varDecl(){
+    consumeToken(TokenType::IdentifierToken, "Expected an identifier");
+    SyntaxToken token = peek(-1);
+    std::unique_ptr<ExprAST> expr = nullptr;
+
+    if(match({TokenType::EqualToken})){
+        expr = expression();
+    }
+
+    consumeToken(TokenType::SemicolonToken, "Expected a ';'");
+    return std::make_unique<VarStmtAST>(token, std::move(expr));
+}
+
 std::unique_ptr<StmtAST> Parser::exprStmt(){
     std::unique_ptr<ExprAST> expr = expression();
     consumeToken(TokenType::SemicolonToken, "Expected a ';'");
@@ -162,6 +182,9 @@ std::unique_ptr<ExprAST> Parser::primary(){
     if(match({TokenType::NumberToken})){ return std::make_unique<LiteralExprAST<double>>(std::stod(peek(-1).getLexeme())); } 
     if(match({TokenType::StringToken})){ return std::make_unique<LiteralExprAST<std::string>>(peek(-1).getLexeme()); }
 
+    // Identifier
+    if(match({TokenType::IdentifierToken})){ return std::make_unique<VariableExprAST>(peek(-1)); }
+
     // Boolean and Nil literals
     if(match({TokenType::TrueToken})){ return std::make_unique<LiteralExprAST<bool>>(true); }
     if (match({TokenType::FalseToken})){ return std::make_unique<LiteralExprAST<bool>>(false); }
@@ -182,7 +205,7 @@ std::vector<std::unique_ptr<StmtAST>> Parser::parse(){
     std::vector<std::unique_ptr<StmtAST>> statements;
     while(peek().getType() != TokenType::EOFToken){
         try{
-            statements.push_back(statement());
+            statements.push_back(declaration());
         } catch(ParseError& e){
             synchronise();
         }

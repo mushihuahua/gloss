@@ -10,7 +10,8 @@ std::map<std::string, TokenType> keywords
     {"true", TrueToken},
     {"false", FalseToken},
     {"nil", NilToken},
-    {"print", PrintToken}
+    {"print", PrintToken},
+    {"var", VarToken}
 };
 
 Lexer::Lexer(const std::string& source)
@@ -82,9 +83,10 @@ void Lexer::scanToken(){
         std::map<std::string, TokenType>::iterator it = keywords.find(identifier);
 
         if(it == keywords.end()) { 
-            std::ostringstream err;
-            err << "Undefined identifier '" << identifier << "'";
-            alert(err.str(), mLine);
+            // std::ostringstream err;
+            // err << "Undefined identifier '" << identifier << "'";
+            // alert(err.str(), mLine);
+            addToken(IdentifierToken);
             return;
         }
 

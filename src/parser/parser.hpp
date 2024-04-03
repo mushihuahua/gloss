@@ -41,8 +41,9 @@ class Parser {
         /*  
         Current Basic Grammar:
 
-        program        → statement* EOF ;
+        program        → declaration* EOF ;
 
+        declaration    → varDecl | statement ;
         statement      → exprStmt | printStmt ;
 
         exprStmt       → expression ";" ;
@@ -60,6 +61,8 @@ class Parser {
         std::unique_ptr<StmtAST> statement();
         std::unique_ptr<StmtAST> exprStmt();
         std::unique_ptr<StmtAST> printStmt();
+        std::unique_ptr<StmtAST> declaration();
+        std::unique_ptr<StmtAST> varDecl();
 
         std::unique_ptr<ExprAST> expression();
         std::unique_ptr<ExprAST> equality();

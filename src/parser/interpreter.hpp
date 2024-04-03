@@ -7,6 +7,7 @@
 #include "ASTs/StmtAST.hpp"
 #include "../lexer/token.hpp"
 #include "../alerts.hpp"
+#include "environment.hpp"
 
 class RuntimeError : public std::runtime_error {
     public:
@@ -17,6 +18,8 @@ class RuntimeError : public std::runtime_error {
 class Interpreter : public ExprVisitor, public StmtVisitor {
     private:
 
+        Environment mEnvironment;
+
         std::any visit(const BinaryExprAST* expr) override;
         std::any visit(const GroupingExprAST* expr) override;
         std::any visit(const UnaryExprAST* expr) override;
@@ -26,8 +29,11 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
         inline std::any visit(const LiteralExprAST<bool>* expr) override;
         inline std::any visit(const LiteralExprAST<std::nullptr_t>* expr) override;
 
+        std::any visit(const VariableExprAST* expr) override;
+
         std::any visit(const ExpressionStmtAST* stmt) override;
         std::any visit(const PrintStmtAST* stmt) override;
+        std::any visit(const VarStmtAST* stmt) override;
 
         void assertNumberOperand(const SyntaxToken& op, std::any left, std::any right);
         bool isTruthy(std::any value);
