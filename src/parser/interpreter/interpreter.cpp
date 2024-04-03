@@ -162,6 +162,26 @@ std::any Interpreter::visit(const PrintStmtAST* stmt) {
     return nullptr;
 }
 
+std::any Interpreter::visit(const VarStmtAST* stmt) {
+    std::any value = nullptr;
+    if(stmt->mInitialiser != nullptr){
+        value = stmt->mInitialiser->accept(*this);
+    }
+
+    mEnvironment.define(stmt->mIdentifier, value);
+    return nullptr;
+}
+
+std::any Interpreter::visit(const VariableExprAST* expr) {
+    return mEnvironment.get(expr->mIdentifier);
+}
+
+std::any Interpreter::visit(const AssignExprAST* expr) {
+    std::any rVal = expr->mValue->accept(*this);
+    mEnvironment.assign(expr->mIdentifier, rVal);
+    return rVal;
+}
+
 void Interpreter::interpret(std::vector<std::unique_ptr<StmtAST>> const& stmts, bool& error) {
     std::cout << "Interpreting\n";
     try {

@@ -36,32 +36,38 @@ class Parser {
         bool match(std::vector<TokenType> types);
         void advance();
         SyntaxToken peek(int offset = 0);
+        SyntaxToken nextToken();
         void synchronise();
 
         /*  
         Current Basic Grammar:
 
-        program        → statement* EOF ;
+        program        → declaration* EOF ;
 
+        declaration    → varDecl | statement ;
         statement      → exprStmt | printStmt ;
 
         exprStmt       → expression ";" ;
         printStmt      → "print" "(" expression ")" ";" ;
 
-        expression     → equality ;
+        expression     → assignment ;
+        assignment    → IDENTIFIER "=" assignment | equality;
         equality       → comparison ( ( "!=" | "==" ) comparison )* ;
         comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
         term           → factor ( ( "-" | "+" ) factor )* ;
         factor         → unary ( ( "/" | "*" ) unary )* ;
         unary          → ( "!" | "-" ) unary | primary ;
-        primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+        primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;
         */
 
         std::unique_ptr<StmtAST> statement();
         std::unique_ptr<StmtAST> exprStmt();
         std::unique_ptr<StmtAST> printStmt();
+        std::unique_ptr<StmtAST> declaration();
+        std::unique_ptr<StmtAST> varDecl();
 
         std::unique_ptr<ExprAST> expression();
+        std::unique_ptr<ExprAST> assignment();
         std::unique_ptr<ExprAST> equality();
         std::unique_ptr<ExprAST> comparison();
         std::unique_ptr<ExprAST> term();

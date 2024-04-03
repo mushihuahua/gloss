@@ -4,7 +4,7 @@ CFLAGS:=-Wall -std=c++17 -c -I../include/
 DEBUGFLAGS:= 
 
 RM:= rm -f
-OBJS:= main.o ./lexer/lexer.o ./lexer/token.o alerts.o ast.o parser/parser.o parser/interpreter.o 
+OBJS:= main.o ./lexer/lexer.o ./lexer/token.o alerts.o ast.o parser/parser.o parser/interpreter/interpreter.o parser/interpreter/environment.o
 
 all: main
 
@@ -19,7 +19,7 @@ main: $(OBJS)
 %.o : %.cpp
 	$(CC) $(CFLAGS) $< -o $@
 
-ast.o: parser/ASTs/ExprAST.hpp parser/visitors/AstPrinterVisitor.cpp
+ast.o: parser/ASTs/ExprAST.hpp parser/ASTs/StmtAST.hpp parser/visitors/AstPrinterVisitor.cpp
 	$(CC) $(CFLAGS) parser/visitors/AstPrinterVisitor.cpp -o ast.o
 
 clean:

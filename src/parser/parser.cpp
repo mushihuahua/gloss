@@ -29,6 +29,13 @@ SyntaxToken Parser::peek(int offset){
     return mTokens.at(index);
 }
 
+SyntaxToken Parser::nextToken(){
+    SyntaxToken token = peek();
+    advance();
+
+    return token;
+}
+
 void Parser::consumeToken(TokenType type, std::string errMsg, size_t offset){
 
     if(peek(offset).getType() == type && peek(offset).getType() != TokenType::EOFToken){
@@ -73,6 +80,24 @@ void Parser::advance(){
 }
 
 std::unique_ptr<ExprAST> Parser::expression(){
+    return assignment();
+}
+
+std::unique_ptr<ExprAST> Parser::assignment(){
+
+    if(peek(1).getType() == TokenType::EqualToken){
+        if(peek().getType() == TokenType::IdentifierToken){
+            SyntaxToken lVal = nextToken();
+            SyntaxToken op = nextToken();
+
+            std::unique_ptr<ExprAST> rVal = assignment();
+
+            return std::make_unique<AssignExprAST>(lVal, std::move(rVal));
+        }
+
+        alert("Did you mean to do '=='?", peek(1).getLine());
+    }
+
     return equality();
 }
 
@@ -82,6 +107,26 @@ std::unique_ptr<StmtAST> Parser::statement(){
         return stmt; 
     }
     return exprStmt();
+}
+
+std::unique_ptr<StmtAST> Parser::declaration(){
+    if(match({TokenType::VarToken})){
+        return varDecl();
+    }
+    return statement();
+}
+
+std::unique_ptr<StmtAST> Parser::varDecl(){
+    consumeToken(TokenType::IdentifierToken, "Expected an identifier");
+    SyntaxToken token = peek(-1);
+    std::unique_ptr<ExprAST> expr = nullptr;
+
+    if(match({TokenType::EqualToken})){
+        expr = expression();
+    }
+
+    consumeToken(TokenType::SemicolonToken, "Expected a ';'");
+    return std::make_unique<VarStmtAST>(token, std::move(expr));
 }
 
 std::unique_ptr<StmtAST> Parser::exprStmt(){
@@ -162,6 +207,9 @@ std::unique_ptr<ExprAST> Parser::primary(){
     if(match({TokenType::NumberToken})){ return std::make_unique<LiteralExprAST<double>>(std::stod(peek(-1).getLexeme())); } 
     if(match({TokenType::StringToken})){ return std::make_unique<LiteralExprAST<std::string>>(peek(-1).getLexeme()); }
 
+    // Identifier
+    if(match({TokenType::IdentifierToken})){ return std::make_unique<VariableExprAST>(peek(-1)); }
+
     // Boolean and Nil literals
     if(match({TokenType::TrueToken})){ return std::make_unique<LiteralExprAST<bool>>(true); }
     if (match({TokenType::FalseToken})){ return std::make_unique<LiteralExprAST<bool>>(false); }
@@ -182,7 +230,7 @@ std::vector<std::unique_ptr<StmtAST>> Parser::parse(){
     std::vector<std::unique_ptr<StmtAST>> statements;
     while(peek().getType() != TokenType::EOFToken){
         try{
-            statements.push_back(statement());
+            statements.push_back(declaration());
         } catch(ParseError& e){
             synchronise();
         }
