@@ -12,8 +12,9 @@ class Environment {
         std::map<std::string, std::any> mValues;
 
     public:
-        void define(const std::string& name, const std::any& value);
+        void define(const SyntaxToken& token, const std::any& value);
         std::any get(const SyntaxToken& token);
+        void assign(const SyntaxToken& token, const std::any& value);
 
         Environment() = default;
 };

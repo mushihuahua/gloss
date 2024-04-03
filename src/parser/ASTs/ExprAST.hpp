@@ -11,6 +11,7 @@ template<typename T>
 class LiteralExprAST;
 class UnaryExprAST;
 class VariableExprAST;
+class AssignExprAST;
 
 class ExprVisitor {
     public:
@@ -25,6 +26,7 @@ class ExprVisitor {
         virtual std::any visit(const LiteralExprAST<std::nullptr_t>* expr) = 0;
 
         virtual std::any visit(const VariableExprAST* expr) = 0;
+        virtual std::any visit(const AssignExprAST* expr) = 0;
 };
 
 class ExprAST {
@@ -87,6 +89,18 @@ class VariableExprAST : public ExprAST {
         SyntaxToken mIdentifier;
 
     VariableExprAST(SyntaxToken identifier) : mIdentifier(identifier) {}
+
+    std::any accept(ExprVisitor& visitor) const override {
+        return visitor.visit(this);
+    }
+};
+
+class AssignExprAST : public ExprAST {
+    public:
+        SyntaxToken mIdentifier;
+        std::unique_ptr<ExprAST> mValue;
+
+    AssignExprAST(SyntaxToken identifier, std::unique_ptr<ExprAST> value) : mIdentifier(identifier), mValue(std::move(value)) {}
 
     std::any accept(ExprVisitor& visitor) const override {
         return visitor.visit(this);

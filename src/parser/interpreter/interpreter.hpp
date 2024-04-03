@@ -30,6 +30,7 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
         inline std::any visit(const LiteralExprAST<std::nullptr_t>* expr) override;
 
         std::any visit(const VariableExprAST* expr) override;
+        std::any visit(const AssignExprAST* expr) override;
 
         std::any visit(const ExpressionStmtAST* stmt) override;
         std::any visit(const PrintStmtAST* stmt) override;

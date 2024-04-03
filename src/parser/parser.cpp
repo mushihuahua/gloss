@@ -29,6 +29,13 @@ SyntaxToken Parser::peek(int offset){
     return mTokens.at(index);
 }
 
+SyntaxToken Parser::nextToken(){
+    SyntaxToken token = peek();
+    advance();
+
+    return token;
+}
+
 void Parser::consumeToken(TokenType type, std::string errMsg, size_t offset){
 
     if(peek(offset).getType() == type && peek(offset).getType() != TokenType::EOFToken){
@@ -73,6 +80,24 @@ void Parser::advance(){
 }
 
 std::unique_ptr<ExprAST> Parser::expression(){
+    return assignment();
+}
+
+std::unique_ptr<ExprAST> Parser::assignment(){
+
+    if(peek(1).getType() == TokenType::EqualToken){
+        if(peek().getType() == TokenType::IdentifierToken){
+            SyntaxToken lVal = nextToken();
+            SyntaxToken op = nextToken();
+
+            std::unique_ptr<ExprAST> rVal = assignment();
+
+            return std::make_unique<AssignExprAST>(lVal, std::move(rVal));
+        }
+
+        alert("Did you mean to do '=='?", peek(1).getLine());
+    }
+
     return equality();
 }
 
