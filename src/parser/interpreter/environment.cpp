@@ -22,6 +22,10 @@ std::any Environment::get(const SyntaxToken& token){
         return it->second;
     }
 
+    if(mEnclosing != nullptr) {
+        return mEnclosing->get(token);
+    }
+
     runtimeAlert(token, "Undefined variable '" + token.getLexeme() + "'");
     return nullptr;
 }
@@ -31,6 +35,11 @@ void Environment::assign(const SyntaxToken& token, const std::any& value){
 
     if(it != mValues.end()){
         it->second = value;
+        return;
+    }
+
+    if(mEnclosing != nullptr) {
+        mEnclosing->assign(token, value);
         return;
     }
 
