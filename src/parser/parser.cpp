@@ -107,6 +107,11 @@ std::unique_ptr<StmtAST> Parser::statement(){
         return stmt; 
     }
 
+    if(match({TokenType::IfToken})){
+        std::unique_ptr<StmtAST> stmt = ifStmt();
+        return stmt;
+    }
+
     if(match({TokenType::LBraceToken})){ return std::make_unique<BlockStmtAST>(block()); }
 
     return exprStmt();
@@ -150,17 +155,38 @@ std::unique_ptr<StmtAST> Parser::exprStmt(){
 }
 
 std::unique_ptr<StmtAST> Parser::printStmt(){
-    if(peek().getType() != TokenType::LParenToken){
-        alert("Expected parentheses after 'print'", peek().getLine());
-        throw ParseError();
-    }
+
+    consumeToken(TokenType::LParenToken, "Expected parentheses after 'print'");
     std::unique_ptr<ExprAST> expr = expression();
-    if(peek(-1).getType() != TokenType::RParenToken){
-        alert("Expected ')' after expression", peek().getLine());
-        throw ParseError();
-    }
+    consumeToken(TokenType::RParenToken, "Expected ')' after expression");
+
     consumeToken(TokenType::SemicolonToken, "Expected a ';'");
     return std::make_unique<PrintStmtAST>(std::move(expr));
+}
+
+std::unique_ptr<StmtAST> Parser::ifStmt(){
+    std::unique_ptr<ExprAST> condition;
+    std::unique_ptr<StmtAST> thenStmt;
+    std::unique_ptr<StmtAST> elseStmt = nullptr;
+
+    consumeToken(TokenType::LParenToken, "Expected parentheses after 'if'");
+
+    condition = expression();
+
+    if(condition == nullptr){
+        alert("Condition given is invalid", peek().getLine());
+        throw ParseError();
+    }
+    
+    consumeToken(TokenType::RParenToken, "Expected ')' after expression");
+
+    thenStmt = statement();
+
+    if(match({TokenType::ElseToken})){
+        elseStmt = statement();
+    }
+
+    return std::make_unique<IfStmtAST>(std::move(condition), std::move(thenStmt), std::move(elseStmt));
 }
 
 std::unique_ptr<ExprAST> Parser::equality(){

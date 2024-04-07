@@ -9,6 +9,7 @@ class ExpressionStmtAST;
 class PrintStmtAST;
 class VarStmtAST;
 class BlockStmtAST;
+class IfStmtAST;
 
 class StmtVisitor {
     public:
@@ -17,6 +18,7 @@ class StmtVisitor {
         virtual std::any visit(const PrintStmtAST* stmt)  = 0;
         virtual std::any visit(const VarStmtAST* stmt)  = 0;
         virtual std::any visit(const BlockStmtAST* stmt)  = 0;
+        virtual std::any visit(const IfStmtAST* stmt)  = 0;
 };
 
 class StmtAST {
@@ -64,6 +66,21 @@ class BlockStmtAST : public StmtAST {
         std::vector<std::unique_ptr<StmtAST>> mStmts;
 
     BlockStmtAST(std::vector<std::unique_ptr<StmtAST>> stmts) : mStmts(std::move(stmts)) {}
+
+    std::any accept(StmtVisitor& visitor) override {
+        return visitor.visit(this);
+    }
+};
+
+class IfStmtAST : public StmtAST {
+    public:
+        std::unique_ptr<ExprAST> mCondition;
+        std::unique_ptr<StmtAST> mThenStmt;
+        std::unique_ptr<StmtAST> mElseStmt;
+
+
+    IfStmtAST(std::unique_ptr<ExprAST> condition, std::unique_ptr<StmtAST> thenExpr, std::unique_ptr<StmtAST> elseExpr) 
+            : mCondition(std::move(condition)), mThenStmt(std::move(thenExpr)), mElseStmt(std::move(elseExpr)) {}
 
     std::any accept(StmtVisitor& visitor) override {
         return visitor.visit(this);
