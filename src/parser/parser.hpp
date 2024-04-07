@@ -45,7 +45,9 @@ class Parser {
         program        → declaration* EOF ;
 
         declaration    → varDecl | statement ;
-        statement      → exprStmt | printStmt ;
+        statement      → exprStmt | printStmt | block ;
+
+        block          → "{" declaration* "}" ;
 
         exprStmt       → expression ";" ;
         printStmt      → "print" "(" expression ")" ";" ;
@@ -61,6 +63,7 @@ class Parser {
         */
 
         std::unique_ptr<StmtAST> statement();
+        std::vector<std::unique_ptr<StmtAST>> block();
         std::unique_ptr<StmtAST> exprStmt();
         std::unique_ptr<StmtAST> printStmt();
         std::unique_ptr<StmtAST> declaration();

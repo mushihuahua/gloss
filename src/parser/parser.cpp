@@ -106,7 +106,21 @@ std::unique_ptr<StmtAST> Parser::statement(){
         std::unique_ptr<StmtAST> stmt = printStmt();
         return stmt; 
     }
+
+    if(match({TokenType::LBraceToken})){ return std::make_unique<BlockStmtAST>(block()); }
+
     return exprStmt();
+}
+
+std::vector<std::unique_ptr<StmtAST>> Parser::block(){
+    std::vector<std::unique_ptr<StmtAST>> statements;
+
+    while(peek().getType() != TokenType::RBraceToken && peek().getType() != TokenType::EOFToken){
+        statements.push_back(declaration());
+    }
+
+    consumeToken(TokenType::RBraceToken, "Expected a '}'");
+    return statements;
 }
 
 std::unique_ptr<StmtAST> Parser::declaration(){

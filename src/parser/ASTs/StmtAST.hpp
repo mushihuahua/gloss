@@ -8,6 +8,7 @@
 class ExpressionStmtAST;
 class PrintStmtAST;
 class VarStmtAST;
+class BlockStmtAST;
 
 class StmtVisitor {
     public:
@@ -15,6 +16,7 @@ class StmtVisitor {
         virtual std::any visit(const ExpressionStmtAST* stmt)  = 0;
         virtual std::any visit(const PrintStmtAST* stmt)  = 0;
         virtual std::any visit(const VarStmtAST* stmt)  = 0;
+        virtual std::any visit(const BlockStmtAST* stmt)  = 0;
 };
 
 class StmtAST {
@@ -51,6 +53,17 @@ class VarStmtAST : public StmtAST {
         std::unique_ptr<ExprAST> mInitialiser;
 
     VarStmtAST(SyntaxToken identifier, std::unique_ptr<ExprAST> initialiser) : mIdentifier(identifier), mInitialiser(std::move(initialiser)) {}
+
+    std::any accept(StmtVisitor& visitor) override {
+        return visitor.visit(this);
+    }
+};
+
+class BlockStmtAST : public StmtAST {
+    public:
+        std::vector<std::unique_ptr<StmtAST>> mStmts;
+
+    BlockStmtAST(std::vector<std::unique_ptr<StmtAST>> stmts) : mStmts(std::move(stmts)) {}
 
     std::any accept(StmtVisitor& visitor) override {
         return visitor.visit(this);

@@ -168,17 +168,36 @@ std::any Interpreter::visit(const VarStmtAST* stmt) {
         value = stmt->mInitialiser->accept(*this);
     }
 
-    mEnvironment.define(stmt->mIdentifier, value);
+    mEnvironment->define(stmt->mIdentifier, value);
+    return nullptr;
+}
+
+std::any Interpreter::visit(const BlockStmtAST* stmt) {
+    std::shared_ptr<Environment> parentEnv = mEnvironment;
+    // std::shared_ptr<Environment> temp = std::move(mEnvironment);
+
+    try { 
+        mEnvironment = std::make_shared<Environment>(parentEnv); 
+        auto it = stmt->mStmts.begin();
+
+        while(it != stmt->mStmts.end()){
+            (*it)->accept(*this);
+            it++;
+        }   
+
+    } catch(const std::exception& e) {}
+    
+    mEnvironment = parentEnv;
     return nullptr;
 }
 
 std::any Interpreter::visit(const VariableExprAST* expr) {
-    return mEnvironment.get(expr->mIdentifier);
+    return mEnvironment->get(expr->mIdentifier);
 }
 
 std::any Interpreter::visit(const AssignExprAST* expr) {
     std::any rVal = expr->mValue->accept(*this);
-    mEnvironment.assign(expr->mIdentifier, rVal);
+    mEnvironment->assign(expr->mIdentifier, rVal);
     return rVal;
 }
 
