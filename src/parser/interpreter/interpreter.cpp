@@ -191,6 +191,63 @@ std::any Interpreter::visit(const BlockStmtAST* stmt) {
     return nullptr;
 }
 
+std::any Interpreter::visit(const IfStmtAST* stmt) {
+    std::any exprResult = stmt->mCondition->accept(*this);
+    bool exprValBool = false;
+    double exprValDouble = 0;
+    
+    if(exprResult.type() == typeid(bool)){ exprValBool = std::any_cast<bool>(exprResult); }
+    if(exprResult.type() == typeid(double)){ exprValDouble = std::any_cast<double>(exprResult); }
+
+    if(exprValBool || exprValDouble){
+        stmt->mThenStmt->accept(*this);
+    } else {
+        if(stmt->mElseStmt != nullptr){
+            stmt->mElseStmt->accept(*this);
+        }
+    }
+
+    return nullptr;
+}
+
+std::any Interpreter::visit(const IfStmtAST* stmt) {
+    std::any exprResult = stmt->mCondition->accept(*this);
+    bool exprValBool = false;
+    double exprValDouble = 0;
+    
+    if(exprResult.type() == typeid(bool)){ exprValBool = std::any_cast<bool>(exprResult); }
+    if(exprResult.type() == typeid(double)){ exprValDouble = std::any_cast<double>(exprResult); }
+
+    if(exprValBool || exprValDouble){
+        stmt->mThenStmt->accept(*this);
+    } else {
+        if(stmt->mElseStmt != nullptr){
+            stmt->mElseStmt->accept(*this);
+        }
+    }
+
+    return nullptr;
+}
+
+std::any Interpreter::visit(const IfStmtAST* stmt) {
+    std::any exprResult = stmt->mCondition->accept(*this);
+    bool exprValBool = false;
+    double exprValDouble = 0;
+    
+    if(exprResult.type() == typeid(bool)){ exprValBool = std::any_cast<bool>(exprResult); }
+    if(exprResult.type() == typeid(double)){ exprValDouble = std::any_cast<double>(exprResult); }
+
+    if(exprValBool || exprValDouble){
+        stmt->mThenStmt->accept(*this);
+    } else {
+        if(stmt->mElseStmt != nullptr){
+            stmt->mElseStmt->accept(*this);
+        }
+    }
+
+    return nullptr;
+}
+
 std::any Interpreter::visit(const VariableExprAST* expr) {
     return mEnvironment->get(expr->mIdentifier);
 }

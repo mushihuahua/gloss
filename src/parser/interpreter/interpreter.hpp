@@ -36,6 +36,7 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
         std::any visit(const PrintStmtAST* stmt) override;
         std::any visit(const VarStmtAST* stmt) override;
         std::any visit(const BlockStmtAST* stmt) override;
+        std::any visit(const IfStmtAST* stmt) override;
 
         void assertNumberOperand(const SyntaxToken& op, std::any left, std::any right);
         bool isTruthy(std::any value);

@@ -48,9 +48,9 @@ class Parser {
         statement      → exprStmt | printStmt | block ;
 
         block          → "{" declaration* "}" ;
-
         exprStmt       → expression ";" ;
         printStmt      → "print" "(" expression ")" ";" ;
+        ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
 
         expression     → assignment ;
         assignment    → IDENTIFIER "=" assignment | equality;
@@ -66,6 +66,7 @@ class Parser {
         std::vector<std::unique_ptr<StmtAST>> block();
         std::unique_ptr<StmtAST> exprStmt();
         std::unique_ptr<StmtAST> printStmt();
+        std::unique_ptr<StmtAST> ifStmt();
         std::unique_ptr<StmtAST> declaration();
         std::unique_ptr<StmtAST> varDecl();
 
