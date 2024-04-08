@@ -51,6 +51,7 @@ class Parser {
         exprStmt       → expression ";" ;
         printStmt      → "print" "(" expression ")" ";" ;
         ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
+        whileStmt      → "while" "(" expression ")" statement ;
 
         expression     → assignment ;
         assignment    → IDENTIFIER "=" assignment | logicalOr ;
@@ -69,6 +70,7 @@ class Parser {
         std::unique_ptr<StmtAST> exprStmt();
         std::unique_ptr<StmtAST> printStmt();
         std::unique_ptr<StmtAST> ifStmt();
+        std::unique_ptr<StmtAST> whileStmt();
         std::unique_ptr<StmtAST> declaration();
         std::unique_ptr<StmtAST> varDecl();
 

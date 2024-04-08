@@ -11,7 +11,8 @@ std::map<std::string, TokenType> keywords
     {"false", FalseToken},
     {"nil", NilToken},
     {"print", PrintToken},
-    {"var", VarToken}
+    {"var", VarToken},
+    {"while", WhileToken}
 };
 
 Lexer::Lexer(const std::string& source)

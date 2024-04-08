@@ -147,6 +147,11 @@ std::unique_ptr<StmtAST> Parser::statement(){
         return stmt; 
     }
 
+    if(match({TokenType::WhileToken})){
+        std::unique_ptr<StmtAST> stmt = whileStmt();
+        return stmt;
+    }
+
     if(match({TokenType::IfToken})){
         std::unique_ptr<StmtAST> stmt = ifStmt();
         return stmt;
@@ -227,6 +232,26 @@ std::unique_ptr<StmtAST> Parser::ifStmt(){
     }
 
     return std::make_unique<IfStmtAST>(std::move(condition), std::move(thenStmt), std::move(elseStmt));
+}
+
+std::unique_ptr<StmtAST> Parser::whileStmt(){
+    std::unique_ptr<ExprAST> condition;
+    std::unique_ptr<StmtAST> body;
+
+    consumeToken(TokenType::LParenToken, "Expected parentheses after 'while'");
+
+    condition = expression();
+
+    if(condition == nullptr){
+        alert("Condition given is invalid", peek().getLine());
+        throw ParseError();
+    }
+
+    consumeToken(TokenType::RParenToken, "Expected ')' after expression");
+
+    body = statement();
+
+    return std::make_unique<WhileStmtAST>(std::move(condition), std::move(body));
 }
 
 std::unique_ptr<ExprAST> Parser::equality(){

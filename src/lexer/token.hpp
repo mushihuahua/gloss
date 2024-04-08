@@ -27,6 +27,7 @@ enum TokenType {
     GreaterThanToken, GreaterThanEqualToken,
 
     IfToken, ElseToken, PrintToken, VarToken,
+    WhileToken,
 
     TrueToken, FalseToken, NilToken,
 

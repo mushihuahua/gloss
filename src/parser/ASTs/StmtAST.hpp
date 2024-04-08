@@ -10,6 +10,7 @@ class PrintStmtAST;
 class VarStmtAST;
 class BlockStmtAST;
 class IfStmtAST;
+class WhileStmtAST;
 
 class StmtVisitor {
     public:
@@ -19,6 +20,7 @@ class StmtVisitor {
         virtual std::any visit(const VarStmtAST* stmt)  = 0;
         virtual std::any visit(const BlockStmtAST* stmt)  = 0;
         virtual std::any visit(const IfStmtAST* stmt)  = 0;
+        virtual std::any visit(const WhileStmtAST* stmt)  = 0;
 };
 
 class StmtAST {
@@ -81,6 +83,19 @@ class IfStmtAST : public StmtAST {
 
     IfStmtAST(std::unique_ptr<ExprAST> condition, std::unique_ptr<StmtAST> thenExpr, std::unique_ptr<StmtAST> elseExpr) 
             : mCondition(std::move(condition)), mThenStmt(std::move(thenExpr)), mElseStmt(std::move(elseExpr)) {}
+
+    std::any accept(StmtVisitor& visitor) override {
+        return visitor.visit(this);
+    }
+};
+
+class WhileStmtAST : public StmtAST {
+    public:
+        std::unique_ptr<ExprAST> mCondition;
+        std::unique_ptr<StmtAST> mBody;
+
+    WhileStmtAST(std::unique_ptr<ExprAST> condition, std::unique_ptr<StmtAST> body) 
+            : mCondition(std::move(condition)), mBody(std::move(body)) {}
 
     std::any accept(StmtVisitor& visitor) override {
         return visitor.visit(this);

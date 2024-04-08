@@ -229,6 +229,14 @@ std::any Interpreter::visit(const IfStmtAST* stmt) {
     return nullptr;
 }
 
+std::any Interpreter::visit(const WhileStmtAST* stmt) {
+    while(isTruthy(stmt->mCondition->accept(*this))){
+        stmt->mBody->accept(*this);
+    }
+
+    return nullptr;
+}
+
 std::any Interpreter::visit(const VariableExprAST* expr) {
     return mEnvironment->get(expr->mIdentifier);
 }
