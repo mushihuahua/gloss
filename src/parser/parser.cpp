@@ -64,6 +64,16 @@ std::unique_ptr<ExprAST> Parser::parseBinaryExpr(std::unique_ptr<ExprAST> expr, 
     return expr;
 }
 
+std::unique_ptr<ExprAST> Parser::parseLogicalExpr(std::unique_ptr<ExprAST> expr, std::function<std::unique_ptr<ExprAST>()> parseFunc){
+    SyntaxToken op = peek(-1);
+    checkExpr(expr, expectedExpression("before", op.getLexeme().c_str()));
+    std::unique_ptr<ExprAST> right = parseFunc();
+    checkExpr(right, expectedExpression("after", op.getLexeme().c_str()));
+    expr = std::make_unique<LogicalExprAST>(op, std::move(expr), std::move(right));
+
+    return expr;
+}
+
 bool Parser::match(std::vector<TokenType> types){
     for(TokenType type : types){
         if(peek().getType() == type && peek().getType() != TokenType::EOFToken){
@@ -98,7 +108,37 @@ std::unique_ptr<ExprAST> Parser::assignment(){
         alert("Did you mean to do '=='?", peek(1).getLine());
     }
 
-    return equality();
+    return logicalOr();
+}
+
+std::unique_ptr<ExprAST> Parser::logicalOr(){
+    std::unique_ptr<ExprAST> expr = logicalAnd();
+
+    if(peek().getType() == TokenType::ErrorOrToken){
+        alert("Did you mean to do '||'?", peek().getLine());
+        throw ParseError();
+    }
+
+    while(match({TokenType::OrToken})){
+        expr = parseLogicalExpr(std::move(expr), [&](){ return logicalAnd(); });
+    }
+
+    return expr;
+}
+
+std::unique_ptr<ExprAST> Parser::logicalAnd(){
+    std::unique_ptr<ExprAST> expr = equality();
+
+    if(peek().getType() == TokenType::ErrorAndToken){
+        alert("Did you mean to do '&&'?", peek().getLine());
+        throw ParseError();
+    }
+
+    while(match({TokenType::AndToken})){
+        expr = parseLogicalExpr(std::move(expr), [&](){ return equality(); });
+    }
+
+    return expr;
 }
 
 std::unique_ptr<StmtAST> Parser::statement(){
@@ -234,7 +274,7 @@ std::unique_ptr<ExprAST> Parser::unary(){
     if(match({TokenType::MinusToken, TokenType::PlusToken, TokenType::ExclamationToken})){
         SyntaxToken op = peek(-1);
         std::unique_ptr<ExprAST> right = unary();
-        checkExpr(right, "Invalid syntax");
+        checkExpr(right, "Invalid syntax.");
         return std::make_unique<UnaryExprAST>(op, std::move(right));
     }
 
@@ -260,6 +300,16 @@ std::unique_ptr<ExprAST> Parser::primary(){
         std::unique_ptr<ExprAST> expr = expression();
         consumeToken(TokenType::RParenToken, "Expected ')'");
         return expr;
+    }
+
+    if(peek().getType() == TokenType::EOFToken){
+        alert("Unexpected end of file", peek().getLine());
+        throw ParseError();
+    }
+
+    if(peek().getType() == TokenType::UnknownToken){
+        alert("Invalid syntax.", peek().getLine());
+        throw ParseError();
     }
 
     return nullptr;

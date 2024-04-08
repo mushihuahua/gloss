@@ -6,6 +6,7 @@
 #include <any>
 
 class BinaryExprAST;
+class LogicalExprAST;
 class GroupingExprAST;
 template<typename T>
 class LiteralExprAST;
@@ -17,6 +18,7 @@ class ExprVisitor {
     public:
         virtual ~ExprVisitor() = default;
         virtual std::any visit(const BinaryExprAST* expr)  = 0;
+        virtual std::any visit(const LogicalExprAST* expr)  = 0;
         virtual std::any visit(const GroupingExprAST* expr)  = 0;
         virtual std::any visit(const UnaryExprAST* expr)  = 0;
 
@@ -41,6 +43,19 @@ class BinaryExprAST : public ExprAST {
         std::unique_ptr<ExprAST> mLeft, mRight;
 
     BinaryExprAST(SyntaxToken Op, std::unique_ptr<ExprAST> left, std::unique_ptr<ExprAST> right) 
+                : mOperator(Op), mLeft(std::move(left)), mRight(std::move(right)) {}
+
+    std::any accept(ExprVisitor& visitor) const override {
+        return visitor.visit(this);
+    }
+};
+
+class LogicalExprAST : public ExprAST {
+    public:
+        SyntaxToken mOperator; // operator
+        std::unique_ptr<ExprAST> mLeft, mRight;
+
+    LogicalExprAST(SyntaxToken Op, std::unique_ptr<ExprAST> left, std::unique_ptr<ExprAST> right) 
                 : mOperator(Op), mLeft(std::move(left)), mRight(std::move(right)) {}
 
     std::any accept(ExprVisitor& visitor) const override {
