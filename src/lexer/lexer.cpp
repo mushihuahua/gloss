@@ -123,11 +123,11 @@ void Lexer::scanToken(){
             break;
 
         case '&':
-            addToken(match('&') ? AndToken : UnknownToken);
+            addToken(match('&') ? AndToken : ErrorAndToken);
             break;
 
         case '|':
-            addToken(match('|') ? OrToken : UnknownToken);
+            addToken(match('|') ? OrToken : ErrorOrToken);
             break;
 
 

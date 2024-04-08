@@ -114,6 +114,11 @@ std::unique_ptr<ExprAST> Parser::assignment(){
 std::unique_ptr<ExprAST> Parser::logicalOr(){
     std::unique_ptr<ExprAST> expr = logicalAnd();
 
+    if(peek().getType() == TokenType::ErrorOrToken){
+        alert("Did you mean to do '||'?", peek().getLine());
+        throw ParseError();
+    }
+
     while(match({TokenType::OrToken})){
         expr = parseLogicalExpr(std::move(expr), [&](){ return logicalAnd(); });
     }
@@ -123,6 +128,11 @@ std::unique_ptr<ExprAST> Parser::logicalOr(){
 
 std::unique_ptr<ExprAST> Parser::logicalAnd(){
     std::unique_ptr<ExprAST> expr = equality();
+
+    if(peek().getType() == TokenType::ErrorAndToken){
+        alert("Did you mean to do '&&'?", peek().getLine());
+        throw ParseError();
+    }
 
     while(match({TokenType::AndToken})){
         expr = parseLogicalExpr(std::move(expr), [&](){ return equality(); });
@@ -290,6 +300,16 @@ std::unique_ptr<ExprAST> Parser::primary(){
         std::unique_ptr<ExprAST> expr = expression();
         consumeToken(TokenType::RParenToken, "Expected ')'");
         return expr;
+    }
+
+    if(peek().getType() == TokenType::EOFToken){
+        alert("Unexpected end of file", peek().getLine());
+        throw ParseError();
+    }
+
+    if(peek().getType() == TokenType::UnknownToken){
+        alert("Invalid syntax.", peek().getLine());
+        throw ParseError();
     }
 
     return nullptr;
