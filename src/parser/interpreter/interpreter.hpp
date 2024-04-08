@@ -21,6 +21,7 @@ class Interpreter : public ExprVisitor, public StmtVisitor {
         std::shared_ptr<Environment> mEnvironment = std::make_shared<Environment>();
 
         std::any visit(const BinaryExprAST* expr) override;
+        std::any visit(const LogicalExprAST* expr) override;
         std::any visit(const GroupingExprAST* expr) override;
         std::any visit(const UnaryExprAST* expr) override;
 

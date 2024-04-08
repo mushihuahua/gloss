@@ -122,6 +122,15 @@ void Lexer::scanToken(){
             addToken(match('=') ? GreaterThanEqualToken : GreaterThanToken);
             break;
 
+        case '&':
+            addToken(match('&') ? AndToken : UnknownToken);
+            break;
+
+        case '|':
+            addToken(match('|') ? OrToken : UnknownToken);
+            break;
+
+
         case '/':
             if(match('/')){
                 while(current() != '\n' && !isEOF()){ mPosition++; }

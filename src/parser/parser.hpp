@@ -32,7 +32,7 @@ class Parser {
         void consumeToken(TokenType type, std::string errMsg, size_t offset = 0);
         void checkExpr(const std::unique_ptr<ExprAST>& expr, std::string errMsg);
         std::unique_ptr<ExprAST> parseBinaryExpr(std::unique_ptr<ExprAST> expr, std::function<std::unique_ptr<ExprAST>()> parseFunc);
-
+        std::unique_ptr<ExprAST> parseLogicalExpr(std::unique_ptr<ExprAST> expr, std::function<std::unique_ptr<ExprAST>()> parseFunc);
         bool match(std::vector<TokenType> types);
         void advance();
         SyntaxToken peek(int offset = 0);
@@ -53,7 +53,9 @@ class Parser {
         ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
 
         expression     → assignment ;
-        assignment    → IDENTIFIER "=" assignment | equality;
+        assignment    → IDENTIFIER "=" assignment | logicalOr ;
+        logicalOr      → logicalAnd ( "||" logicalAnd )* ;
+        logicalAnd     → equality ( "&&" equality )* ;
         equality       → comparison ( ( "!=" | "==" ) comparison )* ;
         comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
         term           → factor ( ( "-" | "+" ) factor )* ;
@@ -72,6 +74,8 @@ class Parser {
 
         std::unique_ptr<ExprAST> expression();
         std::unique_ptr<ExprAST> assignment();
+        std::unique_ptr<ExprAST> logicalOr();
+        std::unique_ptr<ExprAST> logicalAnd();
         std::unique_ptr<ExprAST> equality();
         std::unique_ptr<ExprAST> comparison();
         std::unique_ptr<ExprAST> term();

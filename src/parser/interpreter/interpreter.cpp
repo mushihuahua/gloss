@@ -29,9 +29,9 @@ std::any Interpreter::visit(const BinaryExprAST* expr) {
         return std::any_cast<double>(left) * std::any_cast<double>(right);
     case TokenType::DivideToken:
         assertNumberOperand(expr->mOperator, left, right);
-    if(std::any_cast<double>(right) == 0){
-        throw RuntimeError(expr->mOperator, "Division by zero");
-    }
+        if(std::any_cast<double>(right) == 0){
+            throw RuntimeError(expr->mOperator, "Division by zero");
+        }
         return std::any_cast<double>(left) / std::any_cast<double>(right);
 
     case TokenType::PlusToken:
@@ -63,6 +63,30 @@ std::any Interpreter::visit(const BinaryExprAST* expr) {
         return isEqual(left, right);
     case TokenType::ExclamationEqualToken:
         return !isEqual(left, right);
+
+    default:
+        break;
+    }
+
+    return nullptr;
+}
+
+std::any Interpreter::visit(const LogicalExprAST* expr) {
+    std::any left = expr->mLeft->accept(*this);
+    std::any right;
+    bool leftValue = isTruthy(left);
+
+    switch (expr->mOperator.getType())
+    {
+      case TokenType::AndToken:
+        if(leftValue == false){ return false; }
+        right = expr->mRight->accept(*this);
+        return leftValue && isTruthy(right);
+
+    case TokenType::OrToken:
+        if(leftValue == true){ return true; }
+        right = expr->mRight->accept(*this);
+        return leftValue || isTruthy(right);
     
     default:
         break;
@@ -193,51 +217,8 @@ std::any Interpreter::visit(const BlockStmtAST* stmt) {
 
 std::any Interpreter::visit(const IfStmtAST* stmt) {
     std::any exprResult = stmt->mCondition->accept(*this);
-    bool exprValBool = false;
-    double exprValDouble = 0;
-    
-    if(exprResult.type() == typeid(bool)){ exprValBool = std::any_cast<bool>(exprResult); }
-    if(exprResult.type() == typeid(double)){ exprValDouble = std::any_cast<double>(exprResult); }
 
-    if(exprValBool || exprValDouble){
-        stmt->mThenStmt->accept(*this);
-    } else {
-        if(stmt->mElseStmt != nullptr){
-            stmt->mElseStmt->accept(*this);
-        }
-    }
-
-    return nullptr;
-}
-
-std::any Interpreter::visit(const IfStmtAST* stmt) {
-    std::any exprResult = stmt->mCondition->accept(*this);
-    bool exprValBool = false;
-    double exprValDouble = 0;
-    
-    if(exprResult.type() == typeid(bool)){ exprValBool = std::any_cast<bool>(exprResult); }
-    if(exprResult.type() == typeid(double)){ exprValDouble = std::any_cast<double>(exprResult); }
-
-    if(exprValBool || exprValDouble){
-        stmt->mThenStmt->accept(*this);
-    } else {
-        if(stmt->mElseStmt != nullptr){
-            stmt->mElseStmt->accept(*this);
-        }
-    }
-
-    return nullptr;
-}
-
-std::any Interpreter::visit(const IfStmtAST* stmt) {
-    std::any exprResult = stmt->mCondition->accept(*this);
-    bool exprValBool = false;
-    double exprValDouble = 0;
-    
-    if(exprResult.type() == typeid(bool)){ exprValBool = std::any_cast<bool>(exprResult); }
-    if(exprResult.type() == typeid(double)){ exprValDouble = std::any_cast<double>(exprResult); }
-
-    if(exprValBool || exprValDouble){
+    if(isTruthy(exprResult)){
         stmt->mThenStmt->accept(*this);
     } else {
         if(stmt->mElseStmt != nullptr){

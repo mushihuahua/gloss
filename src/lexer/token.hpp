@@ -13,6 +13,8 @@ enum TokenType {
     PlusToken, MinusToken,
     MultiplyToken, DivideToken,
 
+    AndToken, OrToken,
+
     LParenToken, RParenToken,
     LBraceToken, RBraceToken,
     CommaToken, DotToken, SemicolonToken, 
