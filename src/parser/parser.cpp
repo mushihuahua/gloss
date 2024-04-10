@@ -152,12 +152,19 @@ std::unique_ptr<StmtAST> Parser::statement(){
         return stmt;
     }
 
+    if(match({TokenType::ForToken})){
+        std::unique_ptr<StmtAST> stmt = forStmt();
+        return stmt;
+    }
+
     if(match({TokenType::IfToken})){
         std::unique_ptr<StmtAST> stmt = ifStmt();
         return stmt;
     }
 
-    if(match({TokenType::LBraceToken})){ return std::make_unique<BlockStmtAST>(block()); }
+    if(match({TokenType::LBraceToken})){ 
+        return std::make_unique<BlockStmtAST>(block()); 
+    }
 
     return exprStmt();
 }
@@ -252,6 +259,72 @@ std::unique_ptr<StmtAST> Parser::whileStmt(){
     body = statement();
 
     return std::make_unique<WhileStmtAST>(std::move(condition), std::move(body));
+}
+
+std::unique_ptr<StmtAST> Parser::forStmt(){
+    std::unique_ptr<StmtAST> initialiser = nullptr;
+    std::unique_ptr<ExprAST> condition = nullptr;
+    std::unique_ptr<ExprAST> incrementor = nullptr;
+
+    std::vector<std::unique_ptr<StmtAST>> stmts;
+    std::unique_ptr<StmtAST> body;
+
+    consumeToken(TokenType::LParenToken, "Expected parentheses after 'for'");
+
+    if(peek().getType() != TokenType::SemicolonToken){
+        if(match({TokenType::VarToken})){
+            initialiser = varDecl();
+        } else {
+            initialiser = exprStmt();
+        }
+    } else {
+        consumeToken(TokenType::SemicolonToken, "Expected a ';'");
+    }
+
+    if(peek().getType() != TokenType::SemicolonToken){
+        condition = expression();
+    }
+    consumeToken(TokenType::SemicolonToken, "Expected a ';'");
+
+    if(peek().getType() != TokenType::RParenToken){
+        incrementor = expression();
+    }
+
+    consumeToken(TokenType::RParenToken, "Expected ')' after expression");
+
+    body = statement();
+
+    if(initialiser != nullptr){
+        stmts.push_back(std::move(initialiser));
+    }
+
+    if(condition == nullptr) {
+        condition = std::make_unique<LiteralExprAST<bool>>(true);
+    }
+
+    if(incrementor != nullptr){
+        std::vector<std::unique_ptr<StmtAST>> stmts;
+        std::unique_ptr<StmtAST> incrementorStmt = std::make_unique<ExpressionStmtAST>(std::move(incrementor));
+
+        auto* bodyPtr = body.get();
+
+        if(typeid(*bodyPtr) == typeid(BlockStmtAST)){
+            stmts = std::move(static_cast<BlockStmtAST&>(*body).mStmts);
+            stmts.push_back(std::move(incrementorStmt));
+            body = std::make_unique<BlockStmtAST>(std::move(stmts));
+        } 
+        else {
+            stmts.push_back(std::move(body));
+            stmts.push_back(std::move(incrementorStmt));
+            body = std::make_unique<BlockStmtAST>(std::move(stmts));
+        }
+    }
+
+   stmts.push_back(
+        std::make_unique<WhileStmtAST>(std::move(condition), std::move(body))
+    );
+
+    return std::make_unique<BlockStmtAST>(std::move(stmts));
 }
 
 std::unique_ptr<ExprAST> Parser::equality(){
