@@ -181,6 +181,7 @@ std::vector<std::unique_ptr<StmtAST>> Parser::block(){
 }
 
 std::unique_ptr<StmtAST> Parser::declaration(){
+    // check if the next token is a var token
     if(match({TokenType::VarToken})){
         return varDecl();
     }
@@ -188,7 +189,9 @@ std::unique_ptr<StmtAST> Parser::declaration(){
 }
 
 std::unique_ptr<StmtAST> Parser::varDecl(){
+    // check if the next token is an identifier and move to the next token, output an error if it is not
     consumeToken(TokenType::IdentifierToken, "Expected an identifier");
+    // get the identifier token
     SyntaxToken token = peek(-1);
     std::unique_ptr<ExprAST> expr = nullptr;
 
@@ -197,6 +200,7 @@ std::unique_ptr<StmtAST> Parser::varDecl(){
     }
 
     consumeToken(TokenType::SemicolonToken, "Expected a ';'");
+    // create a new variable statement ast node and return it
     return std::make_unique<VarStmtAST>(token, std::move(expr));
 }
 
@@ -376,6 +380,16 @@ std::unique_ptr<ExprAST> Parser::unary(){
         return std::make_unique<UnaryExprAST>(op, std::move(right));
     }
 
+    return group();
+}
+
+std::unique_ptr<ExprAST> Parser::group(){
+    if(match({TokenType::LParenToken})){
+        std::unique_ptr<ExprAST> expr = expression();
+        consumeToken(TokenType::RParenToken, "Expected ')'");
+        return expr;
+    }
+
     return primary();
 }
 
@@ -392,13 +406,6 @@ std::unique_ptr<ExprAST> Parser::primary(){
     if(match({TokenType::TrueToken})){ return std::make_unique<LiteralExprAST<bool>>(true); }
     if (match({TokenType::FalseToken})){ return std::make_unique<LiteralExprAST<bool>>(false); }
     if(match({TokenType::NilToken})){ return std::make_unique<LiteralExprAST<std::nullptr_t>>(nullptr); }
-
-    // Grouping of expressions
-    if(match({TokenType::LParenToken})){
-        std::unique_ptr<ExprAST> expr = expression();
-        consumeToken(TokenType::RParenToken, "Expected ')'");
-        return expr;
-    }
 
     if(peek().getType() == TokenType::EOFToken){
         alert("Unexpected end of file", peek().getLine());

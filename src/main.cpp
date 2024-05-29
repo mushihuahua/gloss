@@ -85,17 +85,10 @@ void run(const std::string& line){
     Parser parser = Parser(tokens);
     std::vector<std::unique_ptr<StmtAST>> expressions = parser.parse();
 
-    // if(expression == nullptr){
-    //     return;
-    // }
-
-    // AstPrinterVisitor printer = AstPrinterVisitor();
-    // printer.print(expression.get());
-
     Interpreter interpreter = Interpreter();
     interpreter.interpret(expressions, hadRuntimeError);
  
-    for(auto & token : tokens){
-        token.display();
-    }
+    // for(auto & token : tokens){
+    //     token.display();
+    // }
 }

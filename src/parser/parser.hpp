@@ -53,7 +53,11 @@ class Parser {
         ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
         whileStmt      → "while" "(" expression ")" statement ;
         forStmt        → "for" "(" varDecl? ";"  expression? ";" expression? ")" statement ;
-        varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+        varDecl        → "var" IDENTIFIER ("::" ("vector" | "matrix") )? ( "=" expression )? ";" ;
+
+        vector         → "[" expression ("," expression)* "]" ;
+        matrix         → "[" vector ("," vector)* "]" ;
+        arguments      → expression ( "," expression )* ;
 
         expression     → assignment ;
         assignment    → IDENTIFIER "=" assignment | logicalOr ;
@@ -61,10 +65,18 @@ class Parser {
         logicalAnd     → equality ( "&&" equality )* ;
         equality       → comparison ( ( "!=" | "==" ) comparison )* ;
         comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-        term           → factor ( ( "-" | "+" ) factor )* ;
-        factor         → unary ( ( "/" | "*" ) unary )* ;
-        unary          → ( "!" | "-" ) unary | primary ;
-        primary        → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER ;
+        term           → matrixMult ( ( "-" | "+" ) matrixMult )* ;
+        matrixMult     → factor ( "@" factor )* ;
+        factor         → unary ( ( "/" |"*" ) unary )* ;
+        unary          → ( "!" | "-" ) unary | powering ;
+        powering       → group ( ( ("^" | "**" ) group) | power )* ;
+        group          → "(" expression ")" | call ;
+        call           → access ( "(" arguments? ")" )* ;
+        access         → primary ( "[" expression ("," expression)? "]" )* ;
+        primary        → NUMBER | STRING | "true" | "false" | "nil" | IDENTIFIER | vector | matrix;
+
+        power          → ( '⁺' | '⁻' )? superscripts ( superscripts )* ;
+        superscripts   → '⁰' | '¹' | '²' | '³' | '⁴' | '⁵' | '⁶' | '⁷' | '⁸' | '⁹' ;
         */
 
         std::unique_ptr<StmtAST> statement();
@@ -86,6 +98,7 @@ class Parser {
         std::unique_ptr<ExprAST> term();
         std::unique_ptr<ExprAST> factor();
         std::unique_ptr<ExprAST> unary();
+        std::unique_ptr<ExprAST> group();
         std::unique_ptr<ExprAST> primary();
         
         

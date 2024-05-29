@@ -48,6 +48,7 @@ class SyntaxToken{
         TokenType getType() const;
         std::string getLexeme() const;
         int getLine() const;
+        int getPosition() const;
 
         SyntaxToken& operator=(const SyntaxToken& other) {
             return *this;

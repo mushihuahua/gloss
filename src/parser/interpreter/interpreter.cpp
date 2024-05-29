@@ -248,9 +248,8 @@ std::any Interpreter::visit(const AssignExprAST* expr) {
 }
 
 void Interpreter::interpret(std::vector<std::unique_ptr<StmtAST>> const& stmts, bool& error) {
-    std::cout << "Interpreting\n";
+    
     try {
-
         auto it = stmts.begin();
 
         while(it != stmts.end()){

@@ -20,3 +20,7 @@ std::string SyntaxToken::getLexeme() const{
 int SyntaxToken::getLine() const{
     return mLine;
 }
+
+int SyntaxToken::getPosition() const{
+    return mPosition;
+}
